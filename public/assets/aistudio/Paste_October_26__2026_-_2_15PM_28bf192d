@@ -1,0 +1,751 @@
+# BIASHARAHUB KE — EXISTING PROJECT ENHANCEMENT AND FEATURE COMPLETION
+
+## IMPORTANT: EXTEND THE EXISTING APPLICATION — DO NOT START FROM SCRATCH
+
+You have already built an Android application called **BiasharaHub KE — Kenyan Youth Business & Skill Matcher** using Kotlin and Jetpack Compose.
+
+The existing application already contains substantial functionality, including:
+
+1. **Tafuta Biashara** — Skill- and interest-based business idea matching.
+2. **Vijana Waliofaulu** — Entrepreneur success stories and mentorship requests.
+3. **Hali ya Soko KE** — Kenyan business trends and market intelligence.
+4. **Kikokotoo cha Biashara** — Business profit and cashflow calculator.
+5. **Mpango Wangu** — Saved business ideas, progress tracking, and funding guidance.
+
+You must continue working on the existing project.
+
+**DO NOT create a new application, replace the current project, rebuild the interface from scratch, or discard existing functionality.**
+
+Your responsibility is to inspect what you have already implemented, identify missing capabilities, and extend the existing codebase while preserving everything that works.
+
+### Mandatory development rules
+
+* Preserve the existing Kotlin and Jetpack Compose architecture.
+* Preserve the current application name: BiasharaHub KE.
+* Preserve the existing navigation, screens, components, and visual theme.
+* Maintain the current design language, including its layouts, cards, typography, spacing, and interactions.
+* Do not remove or replace existing features merely to simplify implementation.
+* Reuse existing components, models, services, and database structures where appropriate.
+* Modify existing files when necessary rather than creating duplicate implementations.
+* Introduce new screens only when a genuine functional requirement needs them.
+* Avoid unnecessary dependencies and architectural rewrites.
+* Do not replace working functionality with mock data or placeholder screens.
+* Do not claim a feature is complete unless it has actually been implemented and tested.
+* If a requirement is already satisfied, preserve it rather than implementing it again.
+* If a requested improvement conflicts with existing functionality, resolve the conflict without unnecessarily breaking working features.
+
+**Start by inspecting the actual existing project and its current state. Do not assume that every feature described below is missing.**
+
+---
+
+# 1. BRANDING AND COPYRIGHT
+
+The application belongs to the broader **SCI BASE COLLECTIONS** technology ecosystem.
+
+Integrate the official SCI brand colours into the existing theme without destroying or unnecessarily redesigning the interface.
+
+### Official brand colours
+
+* Primary blue: `#0F268C`
+* Accent red: `#FF0000`
+* White: `#FFFFFF`
+
+Use these colours naturally throughout the existing design system.
+
+Blue should generally support primary branding and navigation, red should provide appropriate accents, and white or suitable neutral colours should maintain readability.
+
+You may retain existing complementary colours where they improve accessibility and visual consistency.
+
+### Preserve the existing theme
+
+Do not interpret the branding requirement as permission to redesign the entire application.
+
+Instead:
+
+* Keep the current interface recognizable.
+* Retain the existing screen layouts and component styles.
+* Update theme definitions centrally wherever possible.
+* Apply branding consistently to existing and newly introduced components.
+* Maintain accessible contrast, readable text, and clear interactive states.
+* Ensure that the interface remains usable on small Android screens.
+
+### Developer footer
+
+Add the following exact developer attribution to the appropriate existing screens and the About screen:
+
+**Developed by 💕🙏Engineer Joe 🙏💕**
+
+Also include this copyright notice:
+
+**© 2026 SCI BASE COLLECTIONS. All rights reserved.**
+
+The copyright year should be maintained appropriately as time passes.
+
+The footer must not obscure content, interfere with scrolling, or cover navigation controls.
+
+### About screen
+
+Extend the existing application information area, or add an About screen if one does not already exist.
+
+Include:
+
+* Application name: BiasharaHub KE.
+* Developer: Engineer Joe.
+* Brand: SCI BASE COLLECTIONS.
+* Application description.
+* Current application version.
+* Copyright notice.
+* Developer attribution.
+
+Do not invent company registration details or unsupported legal claims.
+
+---
+
+# 2. MAKE THE EXISTING APPLICATION OFFLINE-FIRST
+
+This is one of the most important improvements.
+
+BiasharaHub KE should be useful to Kenyan students and entrepreneurs who have limited internet access, expensive mobile data, or intermittent connectivity.
+
+Inspect the existing persistence implementation first. Reuse it if it is suitable. If persistent local storage is missing or incomplete, implement an appropriate solution using Room and SQLite.
+
+The following existing or planned features should work offline:
+
+* Browsing available business ideas.
+* Entering skills and interests.
+* Entering exact available capital.
+* Generating personalized recommendations.
+* Viewing recommendation explanations.
+* Saving and bookmarking ideas.
+* Comparing ideas.
+* Calculating startup costs.
+* Calculating revenue, expenses, and estimated profit.
+* Viewing previously downloaded resources.
+* Tracking business launch progress.
+* Accessing previously downloaded business guides.
+* Viewing locally stored success stories and previously downloaded market information.
+* Maintaining user preferences.
+* Accessing previously saved plans.
+* Exporting locally stored information where supported.
+
+### Requirements
+
+1. The core application must open without an internet connection.
+2. The recommendation engine must not depend on a remote API.
+3. Basic functionality must not require registration or login.
+4. Locally saved information must survive application restarts.
+5. Temporary network failures must not erase local information.
+6. Downloads must fail gracefully when connectivity is unavailable.
+7. Previously downloaded documents must remain accessible offline.
+8. The application must not continuously download unnecessary content in the background.
+9. Online synchronization must supplement offline functionality rather than replace it.
+10. Clearly communicate when a feature requires internet access.
+
+Do not introduce a backend requirement simply to make local calculations or recommendations work.
+
+---
+
+# 3. IMPROVE THE EXISTING BUSINESS IDEA MATCHER
+
+Extend the current **Tafuta Biashara** feature rather than replacing it.
+
+Preserve the existing skills, interests, capital brackets, business categories, and recommendation interface.
+
+Enhance the underlying recommendation logic so that it considers:
+
+* Exact available startup capital.
+* Currency.
+* Skills.
+* Interests.
+* Available time.
+* Location and market suitability.
+* Existing equipment and resources.
+* Risk tolerance.
+* Previous business experience.
+* Preferred business model: online, offline, or hybrid.
+
+Retain the existing capital brackets as convenient filters, but allow users to enter an exact amount.
+
+### Explainable recommendation scoring
+
+Implement or improve a deterministic scoring engine with the following initial configurable weights:
+
+| Factor                    |   Weight |
+| ------------------------- | -------: |
+| Capital compatibility     |      25% |
+| Skills compatibility      |      20% |
+| Equipment compatibility   |      15% |
+| Interest compatibility    |      15% |
+| Time compatibility        |      10% |
+| Location compatibility    |       8% |
+| Risk compatibility        |       4% |
+| Business model preference |       3% |
+| **Total**                 | **100%** |
+
+Keep this logic separate from the UI so that it can be tested independently and reused by future features.
+
+Do not duplicate recommendation calculations across different screens.
+
+### Recommendation groups
+
+Organize recommendations into:
+
+* 🟢 Ready Now
+* 🟡 Preparation Needed
+* 🔵 Future Opportunities
+
+Initially show the three strongest relevant recommendations, with an option to explore more.
+
+A high match score must not override a serious feasibility problem. For example, an idea requiring significantly more capital than the user has should not automatically be marked Ready Now.
+
+Account for essential capital, equipment, skill, time, and location requirements when determining readiness.
+
+### Explain why each idea was recommended
+
+For each result, explain:
+
+* Which user skills match the opportunity.
+* How the available capital compares with estimated startup requirements.
+* Which existing resources can be used.
+* How the idea aligns with the user's interests.
+* Whether the time requirements are realistic.
+* What skills or resources are missing.
+* What the user should do next.
+
+Display a score such as **87% Profile Match**.
+
+This percentage must represent compatibility between the business idea and the user's profile. It must not be presented as the probability of success, an investment return, or a guarantee of profitability.
+
+---
+
+# 4. ADD DISCOVERY OPTIONS WITHOUT REMOVING EXISTING ONES
+
+Extend the existing business discovery experience with two clearly accessible options.
+
+### Find Ideas For Me
+
+This should use the user's profile to generate personalized recommendations.
+
+Provide two modes:
+
+* Quick Discovery: fewer questions and faster results.
+* Detailed Discovery: more profile information for more tailored recommendations.
+
+### Explore Ideas
+
+Allow users to browse the locally available business idea catalogue without completing a discovery questionnaire.
+
+Support:
+
+* Keyword search.
+* Category filters.
+* Capital filters.
+* Skill filters.
+* Location suitability filters.
+* Business model filters.
+* Sorting by relevant criteria.
+
+All search and filtering operations must work offline.
+
+Structure the content model so the catalogue can grow from an initial collection of carefully reviewed opportunities to hundreds of records without requiring changes to the UI for every new idea.
+
+---
+
+# 5. COMPLETE THE BUSINESS IDEA DETAIL EXPERIENCE
+
+Inspect the existing idea detail screen and extend it with any missing information.
+
+Where relevant, include:
+
+* Business name and description.
+* Problem being solved.
+* Proposed solution.
+* Target customers.
+* Required skills.
+* Required equipment.
+* Startup cost breakdown.
+* Supplier and sourcing guidance.
+* Location suitability.
+* Time requirements.
+* Pricing considerations.
+* Illustrative revenue scenarios.
+* Operating expenses.
+* Risks and challenges.
+* Applicable compliance considerations.
+* Marketing strategy.
+* Competitor research guidance.
+* A five-step launch roadmap.
+* Profile match score and explanation.
+* Last-reviewed date for information that can become outdated.
+* Save, Compare, and Build Business Plan actions.
+
+Keep these sections readable on mobile devices.
+
+Do not invent supplier contacts, financial facts, market statistics, or legal requirements.
+
+Clearly distinguish verified facts, estimates, and user-provided assumptions.
+
+---
+
+# 6. EXTEND THE EXISTING PROFIT CALCULATOR
+
+Preserve the current **Kikokotoo cha Biashara** interface and working calculations.
+
+Improve the underlying financial logic where necessary.
+
+### Startup cost calculator
+
+Support editable expense items, including:
+
+* Equipment.
+* Initial inventory.
+* Rent or workspace.
+* Transport.
+* Licences and permits.
+* Marketing.
+* Utilities.
+* Working capital.
+* Other user-defined expenses.
+
+### Financial scenarios
+
+Support low, moderate, and high illustrative scenarios.
+
+Allow users to modify assumptions such as:
+
+* Selling price.
+* Expected sales volume.
+* Cost per unit.
+* Daily operating expenses.
+* Number of working days.
+
+Use appropriate calculations:
+
+Revenue = Units Sold × Selling Price per Unit
+
+Gross Profit = Revenue − Direct Costs
+
+Estimated Operating Profit = Revenue − Direct Costs − Operating Expenses
+
+Estimated Net Profit = Total Revenue − Total Expenses
+
+Clearly distinguish revenue, gross profit, operating profit, and net profit.
+
+Where sufficient information is available, provide a break-even calculation.
+
+Explain the assumptions used and allow the user to change them.
+
+Do not describe estimates as guaranteed earnings or reliable predictions of actual business performance.
+
+---
+
+# 7. EXTEND MPANGO WANGU INTO A COMPLETE BUSINESS JOURNEY
+
+Preserve the existing saved ideas, bookmarks, and progress tracking.
+
+Extend them into a structured business journey:
+
+1. Discover.
+2. Evaluate.
+3. Research.
+4. Prepare.
+5. Launch.
+6. Grow.
+
+Each stage should support:
+
+* Actionable tasks.
+* Checklists.
+* Progress indicators.
+* Notes.
+* Completion status.
+* Next recommended action.
+
+Persist progress locally.
+
+Users must be able to work on multiple ideas independently without mixing their tasks or progress.
+
+Use generic category-level guidance where customized instructions are unavailable.
+
+Clearly distinguish general recommendations from legally mandatory requirements.
+
+---
+
+# 8. ADD A BUILD BUSINESS PLAN WORKFLOW
+
+Extend the existing idea detail and launchpad screens with a **Build Business Plan** action.
+
+The destination for future integration is **SCI BUSINESS PLAN**, a separate application within SCI BASE COLLECTIONS.
+
+The business-plan draft should support:
+
+* Business idea.
+* Problem.
+* Solution.
+* Target market.
+* Competitors.
+* Products and services.
+* Pricing.
+* Marketing.
+* Operations.
+* Startup costs.
+* Revenue projections.
+* Expenses.
+* Risks.
+* Growth strategy.
+
+Users should be able to edit their drafts before saving or exporting them.
+
+For this phase, establish a documented JSON export/import format rather than tightly coupling the two applications.
+
+Include the source idea identifier, currency, cost assumptions, and relevant business information.
+
+If the separate SCI BUSINESS PLAN application is not available for integration, implement a reliable export workflow and clearly document what remains to be connected.
+
+Do not claim the integration is complete until it has been implemented and tested.
+
+---
+
+# 9. PREPARE A DOCUMENT LIBRARY USING CLOUDFLARE R2
+
+Extend the existing application architecture to support a library of business documents.
+
+Examples include:
+
+* Startup guides.
+* Business planning templates.
+* Budget worksheets.
+* Market research guides.
+* Marketing resources.
+* Record-keeping templates.
+* Educational PDFs.
+* Other business development materials.
+
+Do not bundle a large document collection inside the Android application.
+
+### Planned storage architecture
+
+Use Cloudflare R2 as the intended object storage for remotely hosted documents.
+
+The future architecture should support:
+
+Android application
+↓
+Django REST API or equivalent secured service
+↓
+Document metadata and access control
+↓
+Cloudflare R2
+↓
+PDFs, templates, images, and other files
+
+The actual files belong in R2. Metadata belongs in PostgreSQL on the server and SQLite locally where appropriate.
+
+Document metadata should support:
+
+* Stable document ID.
+* Title and description.
+* Category.
+* File type and size.
+* Language.
+* Version.
+* Free or premium classification.
+* Publication status.
+* Last-updated date.
+* Remote object key.
+* Download status.
+* Local file location.
+
+### Offline document access
+
+Once a user downloads a document, it should remain accessible without internet.
+
+Use suitable persistent application storage for downloaded files. Store document metadata in the local database.
+
+Handle incomplete downloads, file replacement, version updates, and file removal safely.
+
+### Security
+
+* Never embed Cloudflare secret keys or R2 credentials in the Android app.
+* Do not expose private bucket credentials.
+* Use a properly secured backend or equivalent authorization mechanism for restricted downloads.
+* Use expiring signed URLs or appropriate access controls where needed.
+* Do not treat an obscure URL as a security mechanism.
+* Separate public documents from restricted or premium resources.
+
+For the current implementation, build the document model, storage abstraction, and local document handling only where appropriate.
+
+Do not introduce an unnecessary backend dependency into the core application.
+
+If actual Cloudflare credentials are unavailable, prepare the integration cleanly and document the remaining setup. Do not pretend remote uploads or downloads are operational when they have not been configured and tested.
+
+---
+
+# 10. VERIFY EXISTING ENTREPRENEUR STORIES AND MARKET CLAIMS
+
+Preserve the existing **Vijana Waliofaulu** and **Hali ya Soko KE** features.
+
+However, improve the reliability of their content.
+
+### Entrepreneur stories
+
+For each existing profile:
+
+* Determine whether it is verified, illustrative, or awaiting verification.
+* Cite sources for factual claims where available.
+* Include a last-verified date where appropriate.
+* Do not invent identities, businesses, earnings, or mentorship availability.
+* Do not present fictional case studies as real people.
+* Do not allow users to request mentorship from people who have not agreed to participate.
+
+If a story cannot be verified, label it honestly as an illustrative case study or replace it with a credible, sourced example.
+
+### Market trends
+
+For claims involving percentages, demand growth, or sector expansion:
+
+* Identify the source.
+* Include the publication date.
+* Explain the geographic scope.
+* Identify the period covered.
+* Distinguish measured results from estimates and projections.
+
+Do not retain unsupported statistics merely because they already appear in the application.
+
+Where reliable evidence is unavailable, use appropriately qualified qualitative guidance instead.
+
+Keep previously downloaded information available offline and refresh it only when appropriate connectivity is available.
+
+---
+
+# 11. VERIFY KENYAN FUNDING AND COMPLIANCE INFORMATION
+
+Preserve the existing funding and business formalization guide.
+
+It may include relevant information about:
+
+* eCitizen Business Registration Service.
+* KRA PIN and applicable tax obligations.
+* County business permits.
+* Food-handling requirements where applicable.
+* Youth Enterprise Development Fund.
+* Uwezo Fund.
+* Hustler Fund.
+* KCB 2Jiajiri, where current information is available.
+
+Improve reliability by:
+
+* Using official sources whenever possible.
+* Providing official source links.
+* Including last-verified dates.
+* Verifying current eligibility and application procedures.
+* Explaining that requirements vary by activity, county, and applicant circumstances.
+* Avoiding guarantees of funding approval.
+* Avoiding the claim that every business requires every listed licence or registration.
+
+Let users track applicable requirements without marking them complete automatically.
+
+---
+
+# 12. SUPPORT KES NOW AND OTHER CURRENCIES LATER
+
+Keep Kenya as the primary market and KES as the default currency.
+
+Prepare the data model and formatting logic to support USD and other ISO 4217 currencies in the future.
+
+Requirements:
+
+* Centralize currency formatting.
+* Store currency information alongside monetary values.
+* Avoid hard-coding KES formatting throughout the UI.
+* Never compare amounts in different currencies without an explicit conversion.
+* Never silently apply an arbitrary exchange rate.
+* Identify conversion rates and their dates if currency conversion is introduced later.
+
+Do not complicate the current Kenyan user experience unnecessarily.
+
+---
+
+# 13. PRIVACY AND USER DATA
+
+Improve privacy without disrupting the existing offline workflow.
+
+Requirements:
+
+* Do not require accounts for core functionality.
+* Do not upload users' capital amounts, interests, skills, notes, or saved ideas without an appropriate reason and user consent.
+* Perform recommendation calculations locally.
+* Avoid logging sensitive user information.
+* Store credentials and genuinely sensitive settings securely.
+* Use the local database for ordinary structured application data.
+* Provide an appropriate way to clear user-generated data.
+* Support export or backup where practical.
+* Avoid unnecessary background network activity.
+
+If analytics or advertising are introduced, keep them separate from the core recommendation engine and provide appropriate disclosures and controls.
+
+---
+
+# 14. PREPARE FOR FUTURE MONETIZATION WITHOUT BREAKING THE FREE APP
+
+Design the existing architecture so it can eventually support:
+
+* Advertisements.
+* Premium business idea collections.
+* Premium guides and templates.
+* SCI IDEA Pro or a related premium offering.
+
+Do not introduce real payments unless explicitly requested.
+
+The core application must remain useful without purchasing anything.
+
+If a development-only Pro toggle already exists or is introduced, label it clearly as a simulation.
+
+Never represent a simulated payment or subscription as a real transaction.
+
+Do not introduce intrusive advertisements that prevent access to essential functionality.
+
+---
+
+# 15. KEEP CONTENT AND BUSINESS RULES SEPARATE FROM THE UI
+
+Improve the existing data model where necessary so that business ideas are stored as structured records rather than duplicated across screens.
+
+Support fields such as:
+
+* Stable ID.
+* Category.
+* Required skills.
+* Optional skills.
+* Capital requirements.
+* Equipment.
+* Time requirements.
+* Location suitability.
+* Risk level.
+* Financial assumptions.
+* Sources.
+* Review status.
+* Last-reviewed date.
+* Content version.
+
+Keep business content, recommendation calculations, storage operations, and UI components separated appropriately.
+
+Use the existing architecture wherever it is already suitable.
+
+Do not duplicate services, database tables, screens, or business logic unnecessarily.
+
+Prioritize a smaller collection of carefully reviewed business ideas over a large collection of unsupported records.
+
+---
+
+# 16. TEST THE EXISTING APPLICATION AFTER EVERY CHANGE
+
+Do not focus exclusively on adding new features. Ensure existing functionality continues to work.
+
+Inspect and test:
+
+* Existing navigation.
+* Existing business idea matching.
+* Existing entrepreneur stories.
+* Existing market trend screens.
+* Existing profit calculator.
+* Existing bookmarks.
+* Existing launchpad.
+* Local data persistence.
+* Recommendation scoring.
+* Capital compatibility.
+* Currency formatting.
+* Financial calculations.
+* Progress tracking.
+* Offline startup.
+* Document handling, where implemented.
+* Small-screen layouts.
+* Accessibility and text scaling.
+* Invalid inputs and error states.
+
+Use appropriate unit tests for the recommendation engine and financial calculations.
+
+Do not remove existing functionality to make tests pass.
+
+Fix regressions introduced by your changes.
+
+If a test cannot be performed in the current environment, state that limitation honestly.
+
+---
+
+# 17. REQUIRED WORKFLOW
+
+Follow this workflow while extending the existing project.
+
+### Step 1: Inspect
+
+Examine the existing source code, project structure, screens, navigation, database, models, services, dependencies, and current implementation.
+
+Determine which requirements are already implemented.
+
+### Step 2: Report
+
+Briefly report:
+
+* What already works.
+* What is missing.
+* What needs improvement.
+* Any factual claims requiring verification.
+* Any architectural problems that must be addressed.
+
+Do not stop after producing this report. Continue implementing the requested improvements unless a genuine blocker prevents progress.
+
+### Step 3: Prioritize
+
+Prioritize improvements in this order:
+
+1. Preserve existing functionality and resolve regressions.
+2. Improve offline capability and local persistence.
+3. Complete the recommendation engine and feasibility classification.
+4. Improve financial accuracy and transparency.
+5. Add the structured business journey.
+6. Add the Build Business Plan export workflow.
+7. Integrate SCI branding and the required footer.
+8. Prepare document storage and Cloudflare R2 integration.
+9. Improve the credibility of stories, trends, funding information, and compliance guidance.
+10. Improve testing, accessibility, and performance.
+
+Adjust this order if the existing project already satisfies some requirements.
+
+### Step 4: Implement incrementally
+
+Make changes in manageable stages.
+
+After each stage:
+
+* Build the project.
+* Run relevant tests.
+* Resolve errors.
+* Verify that existing features still work.
+
+Do not replace the whole codebase with a generated alternative.
+
+### Step 5: Report completion
+
+At the end, provide:
+
+* A summary of the improvements made.
+* The existing files modified.
+* New files added.
+* Features successfully implemented.
+* Tests performed and their actual results.
+* Features that remain incomplete.
+* Any external configuration still required.
+* Any limitations that prevent full verification.
+
+---
+
+# FINAL INSTRUCTION
+
+**Continue developing the existing BiasharaHub KE project exactly where it currently stands. Do not start afresh.**
+
+Preserve its existing working features, Kotlin and Jetpack Compose implementation, current application identity, and deployed visual theme.
+
+Add the missing capabilities incrementally, integrate the official SCI brand colours, include the required copyright notice and developer attribution, and prepare the application for secure Cloudflare R2 document storage.
+
+The final result should be a more complete, reliable, accessible, privacy-conscious, offline-first Kenyan entrepreneurship application without unnecessarily disrupting the work that has already been completed.

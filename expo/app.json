@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "BiasharaHub KE",
+    "slug": "biasharahub-ke",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#f5f7fb",
+    "android": {
+      "package": "com.aistudio.biasharahub.kenyau"
+    },
+    "ios": {
+      "bundleIdentifier": "com.aistudio.biasharahub.kenyau"
+    }
+  }
+}
