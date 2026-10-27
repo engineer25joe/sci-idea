@@ -1,21 +1,27 @@
-name: Build Android APK
+name: Validate Android Build Workflow
 
 'on':
-push:
-branches: [main]
-workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-build:
-runs-on: ubuntu-24.04
-steps:
-- name: Checkout repository
-uses: actions/checkout@v5
+  validate:
+    name: Validate Repository
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-  - name: Show repository files
-    run: |
-      pwd
-      ls -la
-      find . -maxdepth 4 -type f -name "gradlew"
-      find . -maxdepth 4 -type f -name "settings.gradle.kts"
-      find . -maxdepth 4 -type f -name "libs.versions.toml"
+      - name: List repository files
+        shell: bash
+        run: |
+          echo "Repository root:"
+          pwd
+          ls -la
+          echo "Searching for Android build files:"
+          find . -maxdepth 5 -type f -name "gradlew" -not -path "./.git/*"
