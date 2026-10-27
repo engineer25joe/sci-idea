@@ -1,52 +1,43 @@
 name: Build BiasharaHub KE APK
 
 on:
-push:
-branches:
-- main
-workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 permissions:
-contents: read
+  contents: read
 
 jobs:
-build:
-name: Build Debug APK
-runs-on: ubuntu-24.04
+  build:
+    name: Build Debug APK
+    runs-on: ubuntu-24.04
 
-```
-steps:
-  - name: Checkout repository
-    uses: actions/checkout@v5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-  - name: Set up Java
-    uses: actions/setup-java@v5
-    with:
-      distribution: temurin
-      java-version: '17'
-      cache: gradle
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
 
-  - name: Set up Android SDK
-    uses: android-actions/setup-android@v3
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
 
-  - name: Check project files
-    run: |
-      echo "Checking Gradle wrapper..."
-      test -f gradlew
-      test -f gradle/wrapper/gradle-wrapper.properties
-      echo "Gradle wrapper files found."
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
 
-  - name: Make Gradle wrapper executable
-    run: chmod +x gradlew
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --stacktrace
 
-  - name: Build debug APK
-    run: ./gradlew assembleDebug --stacktrace
-
-  - name: Upload debug APK
-    uses: actions/upload-artifact@v4
-    with:
-      name: BiasharaHub-KE-debug-APK
-      path: '**/build/outputs/apk/debug/*.apk'
-      if-no-files-found: error
-      retention-days: 14
-```
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: BiasharaHub-KE-debug-APK
+          path: '**/build/outputs/apk/debug/*.apk'
+          if-no-files-found: error
+          retention-days: 14
