@@ -1,6 +1,6 @@
 name: Build Android APK
 
-on:
+'on':
 push:
 branches:
 - main
@@ -10,7 +10,6 @@ jobs:
 build:
 runs-on: ubuntu-24.04
 
-```
 steps:
   - name: Checkout repository
     uses: actions/checkout@v5
@@ -19,5 +18,4 @@ steps:
     run: |
       pwd
       ls -la
-      find . -maxdepth 3 -type f \( -name "gradlew" -o -name "settings.gradle.kts" -o -name "libs.versions.toml" \)
-```
+      find . -maxdepth 4 -type f \( -name "gradlew" -o -name "settings.gradle.kts" -o -name "libs.versions.toml" \)
