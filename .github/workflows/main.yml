@@ -2,20 +2,20 @@ name: Build Android APK
 
 'on':
 push:
-branches:
-- main
+branches: [main]
 workflow_dispatch:
 
 jobs:
 build:
 runs-on: ubuntu-24.04
-
 steps:
-  - name: Checkout repository
-    uses: actions/checkout@v5
+- name: Checkout repository
+uses: actions/checkout@v5
 
   - name: Show repository files
     run: |
       pwd
       ls -la
-      find . -maxdepth 4 -type f \( -name "gradlew" -o -name "settings.gradle.kts" -o -name "libs.versions.toml" \)
+      find . -maxdepth 4 -type f -name "gradlew"
+      find . -maxdepth 4 -type f -name "settings.gradle.kts"
+      find . -maxdepth 4 -type f -name "libs.versions.toml"
