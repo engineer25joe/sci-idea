@@ -1,43 +1,57 @@
-name: Android Debug APK
+name: Build BiasharaHub KE APK
 
 'on':
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+push:
+branches:
+- main
+workflow_dispatch:
 
 permissions:
-  contents: read
+contents: read
 
 jobs:
-  build:
-    name: Build Debug APK
-    runs-on: ubuntu-24.04
+build:
+name: Compile Debug APK
+runs-on: ubuntu-24.04
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+```
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v5
 
-      - name: Setup Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '17'
+  - name: Set up Java
+    uses: actions/setup-java@v5
+    with:
+      distribution: temurin
+      java-version: '17'
 
-      - name: Check Android SDK
-        run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "SDK location verified"
+  - name: Set up Android SDK
+    uses: android-actions/setup-android@v3
 
-      - name: Build APK
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
+  - name: Install Android SDK 36 and 36.1
+    run: |
+      sdkmanager "platform-tools" "platforms;android-36" "platforms;android-36.1" "build-tools;36.0.0"
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: BiasharaHub-KE-debug-APK
-          path: '**/build/outputs/apk/debug/*.apk'
-          if-no-files-found: error
-          retention-days: 14
+  - name: Download Gradle
+    run: |
+      curl -fL https://services.gradle.org/distributions/gradle-9.3.1-bin.zip -o "$RUNNER_TEMP/gradle.zip"
+      unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
+      echo "$RUNNER_TEMP/gradle-9.3.1/bin" >> "$GITHUB_PATH"
+
+  - name: Generate Gradle Wrapper
+    run: |
+      gradle wrapper --gradle-version 9.3.1 --distribution-type bin
+
+  - name: Build debug APK
+    run: |
+      chmod +x gradlew
+      ./gradlew assembleDebug --stacktrace
+
+  - name: Upload debug APK
+    uses: actions/upload-artifact@v4
+    with:
+      name: BiasharaHub-KE-debug-APK
+      path: app/build/outputs/apk/debug/*.apk
+      if-no-files-found: error
+      retention-days: 14
+```
