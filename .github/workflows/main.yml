@@ -1,58 +1,58 @@
 name: Build BiasharaHub KE APK
 
-"on":
+on:
   push:
   branches:
-   - main
+    - main
 workflow_dispatch:
 
 permissions:
-contents: read
+ contents: read
 
 jobs:
  build:
-   name: Compile Debug APK
-   runs-on: ubuntu-24.04
+  name: Compile Debug APK
+  runs-on: ubuntu-24.04
 
-   steps:
-     - name: Checkout repository
-       uses: actions/checkout@v5
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
 
-     - name: Set up Java
-       uses: actions/setup-java@v5
-       with:
-         distribution: temurin
-         java-version: "17"
+    - name: Set up Java
+      uses: actions/setup-java@v5
+      with:
+        distribution: temurin
+        java-version: "17"
 
-     - name: Set up Android SDK
-       uses: android-actions/setup-android@v4
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v4
 
-     - name: Install Android SDK
-       run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+    - name: Install Android SDK
+      run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
-     - name: Install Gradle
-       run: |
-         curl -L https://services.gradle.org/distributions/gradle-9.3.1-bin.zip -o gradle.zip
-         unzip -q gradle.zip
-         echo "$GITHUB_WORKSPACE/gradle-9.3.1/bin" >> "$GITHUB_PATH"
+    - name: Install Gradle
+      run: |
+        curl -L https://services.gradle.org/distributions/gradle-9.3.1-bin.zip -o gradle.zip
+        unzip -q gradle.zip
+        echo "$GITHUB_WORKSPACE/gradle-9.3.1/bin" >> "$GITHUB_PATH"
 
-     - name: Verify project
-       run: |
-         test -f settings.gradle.kts
-         test -f build.gradle.kts
-         test -f gradle/libs.versions.toml
-         test -f app/build.gradle.kts
+    - name: Verify project
+      run: |
+        test -f settings.gradle.kts
+        test -f build.gradle.kts
+        test -f gradle/libs.versions.toml
+        test -f app/build.gradle.kts
 
-     - name: Generate debug keystore
-       run: keytool -genkeypair -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+    - name: Generate debug keystore
+      run: keytool -genkeypair -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
 
-     - name: Build debug APK
-       run: gradle assembleDebug --stacktrace
+    - name: Build debug APK
+      run: gradle assembleDebug --stacktrace
 
-     - name: Upload debug APK
-       uses: actions/upload-artifact@v4
-       with:
-         name: BiasharaHub-KE-debug-APK
-         path: app/build/outputs/apk/debug/*.apk
-         if-no-files-found: error
-         retention-days: 14
+    - name: Upload debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: BiasharaHub-KE-debug-APK
+        path: app/build/outputs/apk/debug/*.apk
+        if-no-files-found: error
+        retention-days: 14
