@@ -1,19 +1,20 @@
 name: Build BiasharaHub KE APK
 
 'on':
- push:
- branches:
-  - main
+push:
+branches:
+- main
 workflow_dispatch:
 
 permissions:
 contents: read
 
 jobs:
- build:
- name: Compile Debug APK
- runs-on: ubuntu-24.04
- steps:
+build:
+name: Compile Debug APK
+runs-on: ubuntu-24.04
+
+steps:
   - name: Checkout repository
     uses: actions/checkout@v5
 
@@ -21,56 +22,31 @@ jobs:
     uses: actions/setup-java@v5
     with:
       distribution: temurin
-        java-version: '17'
+      java-version: '17'
 
-  - name: Verify Android SDK
-    shell: bash
-    run: |
-      echo "ANDROID_HOME=$ANDROID_HOME"
-      echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-      ls -la "$ANDROID_HOME"
-      "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --version
+  - name: Set up Android SDK
+    uses: android-actions/setup-android@v4
 
-  - name: Install required Android SDK packages
-    shell: bash
-    run: |
-      yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
-      "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
-        "platform-tools" \
-        "platforms;android-36" \
-        "build-tools;36.0.0"
+  - name: Install Android SDK
+    run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
   - name: Install Gradle
-    shell: bash
     run: |
-      curl -fL https://services.gradle.org/distributions/gradle-9.3.1-bin.zip -o "$RUNNER_TEMP/gradle.zip"
-      unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
-      echo "$RUNNER_TEMP/gradle-9.3.1/bin" >> "$GITHUB_PATH"
+      curl -L https://services.gradle.org/distributions/gradle-9.3.1-bin.zip -o gradle.zip
+      unzip -q gradle.zip
+      echo "$GITHUB_WORKSPACE/gradle-9.3.1/bin" >> "$GITHUB_PATH"
 
-  - name: Verify project files
-    shell: bash
+  - name: Verify project
     run: |
       test -f settings.gradle.kts
       test -f build.gradle.kts
       test -f gradle/libs.versions.toml
       test -f app/build.gradle.kts
 
-  - name: Generate temporary debug keystore
-    shell: bash
-    run: |
-      keytool -genkeypair \
-        -v \
-        -keystore "$GITHUB_WORKSPACE/debug.keystore" \
-        -storepass android \
-        -alias androiddebugkey \
-        -keypass android \
-        -keyalg RSA \
-        -keysize 2048 \
-        -validity 10000 \
-        -dname "CN=Android Debug,O=Android,C=US"
+  - name: Generate debug keystore
+    run: keytool -genkeypair -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
 
   - name: Build debug APK
-    shell: bash
     run: gradle assembleDebug --stacktrace
 
   - name: Upload debug APK
