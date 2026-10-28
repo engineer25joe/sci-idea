@@ -57,6 +57,470 @@ class HustleRepository(context: Context) {
 
     val businessIdeas: List<BusinessIdea> = listOf(
         BusinessIdea(
+            id = "urban_farming",
+            title = "Urban Vegetable Farming",
+            shengTitle = "Kilimo cha Mboga Mjini",
+            category = SkillCategory.AGRIBUSINESS,
+            interestArea = InterestArea.FARMING_LIVESTOCK,
+            summary = "Urban vegetable farming is a profitable business that can be started in small spaces using modern techniques like vertical farming, container gardening, or greenhouse systems.",
+            problemBeingSolved = "City residents struggle with high food prices and chemical-laden vegetables sold in distant wholesale markets.",
+            proposedSolution = "Produce fresh, chemical-free sukuma wiki, spinach, capsicum, and herbs using space-efficient vertical containers and hydroponic trays.",
+            targetCustomers = listOf("Health-conscious estate residents", "Local estate mama mbogas and grocery stalls", "Neighbourhood restaurants and food joints"),
+            matchedSkills = listOf("horticulture", "poultry"),
+            capitalMinKes = 10000,
+            capitalMaxKes = 50000,
+            capitalTier = CapitalTier.LOW,
+            capitalBreakdown = mapOf(
+                "Vertical containers & coco peat seedling trays" to 8000,
+                "Certified high-yield vegetable seeds & organic manure" to 4500,
+                "Drip irrigation tubing & spray nozzles" to 5500,
+                "Balcony shade netting & pest control neem oil" to 3000
+            ),
+            estimatedDailyRevenueKes = 800..2500,
+            estimatedMonthlyProfitKes = 15000..60000,
+            paybackPeriod = "1.5 - 2 months",
+            idealLocations = listOf(EnvironmentType.URBAN, EnvironmentType.PERI_URBAN),
+            businessModel = BusinessModelType.HYBRID,
+            riskLevel = RiskLevel.LOW,
+            timeCommitment = TimeCommitment.PART_TIME,
+            requiredEquipmentIds = listOf("land_space", "hand_tools"),
+            equipmentNeeded = listOf("Vertical planting towers or wooden crates", "Drip irrigation pipe kit", "Water storage bucket", "Garden shears & hand trowel"),
+            supplierAndSourcingGuidance = "Purchase quality hybrid seeds from Kenya Seed Company or Simlaw Seeds along Kijabe Street; buy coco peat from peri-urban nursery centers.",
+            pricingConsiderations = "Harvest bunches sell for KSh 30 - 50 each; weekly household organic vegetable baskets retail at KSh 500 - 800.",
+            marketingStrategy = "Share daily growth photos on estate WhatsApp groups and offer free sample bunches to 5 influential neighbours.",
+            competitorResearchGuidance = "Supermarket organic vegetables are priced double; your freshly cut greens delivered warm will win instantly.",
+            launchSteps = listOf(
+                "Source quality hybrid seeds and seedling trays.",
+                "Prepare vertical wooden shelves or balcony planter boxes.",
+                "Install drip lines and test automated watering.",
+                "Launch first harvest pre-orders on estate WhatsApp group."
+            ),
+            compliance = listOf(
+                ComplianceRequirement("Local Agricultural Officer Advisory", "Ministry of Agriculture", "Free", "Free biosecurity and seedling health guidance", false),
+                ComplianceRequirement("County Urban Agriculture Guideline", "County Environment Dept", "Free", "Compliance with residential water usage policies", false)
+            ),
+            mpesaTip = "Collect weekly advance M-PESA subscriptions for basket deliveries on Monday mornings.",
+            insiderTips = listOf(
+                "Spinach and coriander (dhania) have the fastest turnaround: you can harvest every 2-3 weeks continuously.",
+                "Vertical towers let you grow 80 plants in just 1 square meter of balcony space."
+            ),
+            risksAndMitigations = listOf(
+                "Pest infestation" to "Spray natural organic neem oil extract once every week instead of chemical pesticides.",
+                "Water supply interruption" to "Connect a 100L elevated rainwater or tap storage container."
+            ),
+            lastReviewedDate = "October 2026",
+            rating = 4.5,
+            reviewCount = 120,
+            thumbnailType = "farming"
+        ),
+
+        BusinessIdea(
+            id = "phone_accessories",
+            title = "Mobile Phone Accessories Shop",
+            shengTitle = "Duka la Vifaa vya Simu",
+            category = SkillCategory.RETAIL_COMMERCE,
+            interestArea = InterestArea.ONLINE_FREELANCING,
+            summary = "High-turnover retail shop stocking tempered glass screen protectors, fast chargers, power banks, earphones, phone covers, and smart accessories.",
+            problemBeingSolved = "Smartphone users frequently break screen protectors, lose charging cables, and need quick reliable replacements near transit stops.",
+            proposedSolution = "Quick-turnaround display booth or estate shop offering instant screen protector installation, cable testing, and genuine mobile accessories.",
+            targetCustomers = listOf("Commuters at matatu stops", "Estate residents", "Bodaboda riders needing durable phone holders"),
+            matchedSkills = listOf("phone_repair", "retail_commerce", "social_media"),
+            capitalMinKes = 50000,
+            capitalMaxKes = 200000,
+            capitalTier = CapitalTier.MEDIUM,
+            capitalBreakdown = mapOf(
+                "Wholesale stock (chargers, screen protectors, cases)" to 45000,
+                "Display glass counter & LED lighting" to 18000,
+                "Shop deposit & branding sign" to 25000,
+                "Working capital & spare parts" to 12000
+            ),
+            estimatedDailyRevenueKes = 3000..8500,
+            estimatedMonthlyProfitKes = 35000..90000,
+            paybackPeriod = "2 - 3 months",
+            idealLocations = listOf(EnvironmentType.URBAN, EnvironmentType.PERI_URBAN),
+            businessModel = BusinessModelType.OFFLINE,
+            riskLevel = RiskLevel.MEDIUM,
+            timeCommitment = TimeCommitment.FULL_TIME,
+            requiredEquipmentIds = listOf("hand_tools"),
+            equipmentNeeded = listOf("Glass display counter", "Hot air gun & screen cleaning cloths", "Cable test device", "Laminated price list"),
+            supplierAndSourcingGuidance = "Wholesale markets in Nairobi CBD (Luthuli Avenue, Munyu Road, Dubois Road) at 50-70% lower than retail.",
+            pricingConsiderations = "Ceramic screen protectors wholesale for KSh 40 and install for KSh 200 (400% margin!). Fast chargers wholesale at KSh 180 and retail at KSh 500.",
+            marketingStrategy = "Offer free screen cleaning and test every cable in front of the buyer to build unwavering trust.",
+            competitorResearchGuidance = "Avoid unbranded fake chargers that explode; stock reliable certified brands like Oraimo, Baseus, and generic Tier-1 equivalents.",
+            launchSteps = listOf(
+                "Secure a high-footfall corner stall near a busy estate stage.",
+                "Purchase initial fast-moving inventory from Luthuli Avenue wholesalers.",
+                "Mount bright LED lighting and an eye-catching neon shop sign.",
+                "Offer free installation on all screen protectors to build initial clientele."
+            ),
+            compliance = listOf(
+                ComplianceRequirement("Single Business Permit", "County Government", "KSh 4,500 - 8,500", "Annual commercial retail trading license", true),
+                ComplianceRequirement("Business Name Registration", "eCitizen BRS", "KSh 950", "Official business registration", false)
+            ),
+            mpesaTip = "Have your Pochi La Biashara QR standee front and center on the counter for instant tap payment.",
+            insiderTips = listOf(
+                "Type-C cables, ceramic matte screen protectors, and 10,000mAh power banks are your fastest money-makers.",
+                "Upsell a phone case whenever a customer buys a screen protector for an immediate KSh 300 boost."
+            ),
+            risksAndMitigations = listOf(
+                "Slow-moving stock" to "Only purchase models for the top 10 phones in Kenya (Infinix, Tecno, Samsung A-series, Redmi).",
+                "Counterfeits" to "Test every wholesale batch before leaving Luthuli Avenue."
+            ),
+            lastReviewedDate = "October 2026",
+            rating = 4.2,
+            reviewCount = 98,
+            thumbnailType = "electronics"
+        ),
+
+        BusinessIdea(
+            id = "digital_marketing_agency",
+            title = "Digital Marketing Services",
+            shengTitle = "Huduma za Digital Marketing",
+            category = SkillCategory.SERVICES_LOGISTICS,
+            interestArea = InterestArea.ONLINE_FREELANCING,
+            summary = "Help local SMEs, clinics, schools, and salons grow their revenue through Google Business optimization, TikTok campaigns, Meta ads, and social content.",
+            problemBeingSolved = "Small business owners struggle to reach new customers online and waste money on ineffective boosted posts.",
+            proposedSolution = "Performance-driven monthly marketing packages including video reels, local SEO, WhatsApp automation, and targeted ad campaigns.",
+            targetCustomers = listOf("Private dental clinics & pharmacies", "Beauty salons & spas", "Real estate agents", "Local hardware stores"),
+            matchedSkills = listOf("graphic_design", "social_media", "photo_video", "web_dev"),
+            capitalMinKes = 10000,
+            capitalMaxKes = 100000,
+            capitalTier = CapitalTier.LOW,
+            capitalBreakdown = mapOf(
+                "Canva Pro & CapCut subscription" to 3000,
+                "High-speed 4G data & Wi-Fi router" to 4000,
+                "Portfolio website hosting & domain" to 3000,
+                "Client acquisition ad budget" to 5000
+            ),
+            estimatedDailyRevenueKes = 2000..6000,
+            estimatedMonthlyProfitKes = 30000..95000,
+            paybackPeriod = "3 - 4 weeks",
+            idealLocations = listOf(EnvironmentType.ONLINE, EnvironmentType.URBAN, EnvironmentType.PERI_URBAN),
+            businessModel = BusinessModelType.ONLINE,
+            riskLevel = RiskLevel.LOW,
+            timeCommitment = TimeCommitment.FLEXIBLE,
+            requiredEquipmentIds = listOf("smartphone"),
+            equipmentNeeded = listOf("Laptop or high-end smartphone", "Ring light & tripod for video shoots", "Stable internet connection"),
+            supplierAndSourcingGuidance = "SaaS software online via debit/prepaid cards or M-PESA Global Pay virtual cards.",
+            pricingConsiderations = "Charge KSh 12,000 - 25,000 monthly retainer per client. 4 active clients yield KSh 60,000+ steady profit.",
+            marketingStrategy = "Walk into businesses with poor Google Maps listings or dormant social pages, optimize their profile for free, then pitch ongoing management.",
+            competitorResearchGuidance = "Large marketing agencies charge KSh 100k+ and ignore small businesses; deliver quick, tangible local leads to stand out.",
+            launchSteps = listOf(
+                "Create 3 case studies optimizing profiles of local business acquaintances.",
+                "Pitch 10 local service businesses offering a 14-day lead generation trial.",
+                "Deliver real customer calls and WhatsApp inquiries.",
+                "Close 3 ongoing monthly retainer contracts."
+            ),
+            compliance = listOf(
+                ComplianceRequirement("Individual KRA PIN", "KRA iTax", "Free", "Tax compliance for corporate payments", false),
+                ComplianceRequirement("Business Name Registration", "eCitizen BRS", "KSh 950", "Official registered trading name", false)
+            ),
+            mpesaTip = "Invoice clients via professional PDF quotes with embedded Paybill / Till payment terms.",
+            insiderTips = listOf(
+                "Focus on short-form vertical video (TikTok & Reels); businesses will pay premium rates for video views that convert into customers.",
+                "Google Business Profile optimization drives immediate phone calls without ad spend."
+            ),
+            risksAndMitigations = listOf(
+                "Client churn" to "Send a simple monthly 1-page report detailing phone calls and inquiries generated.",
+                "Late payment" to "Charge 100% upfront at the start of each service month."
+            ),
+            lastReviewedDate = "October 2026",
+            rating = 4.4,
+            reviewCount = 76,
+            thumbnailType = "tech"
+        ),
+
+        BusinessIdea(
+            id = "clean_energy_solutions",
+            title = "Clean Energy Solutions",
+            shengTitle = "Mwangaza wa Solar & Biogas",
+            category = SkillCategory.DIGITAL_TECH,
+            interestArea = InterestArea.CRAFTS_FABRICATION,
+            summary = "Sales, installation, and maintenance of affordable solar backup systems, solar water heaters, and rural micro-solar solutions for homes and farms.",
+            problemBeingSolved = "High KPLC electricity tariffs and frequent grid blackouts disrupt businesses and households across Kenyan towns and counties.",
+            proposedSolution = "Turnkey solar installations providing reliable clean backup power, solar water pumping for farms, and energy-efficient LED upgrades.",
+            targetCustomers = listOf("Off-grid and peri-urban homeowners", "Agri-business farms needing water pumping", "Estate barbershops and salons avoiding blackouts"),
+            matchedSkills = listOf("plumbing_elec", "welding", "carpentry"),
+            capitalMinKes = 100000,
+            capitalMaxKes = 350000,
+            capitalTier = CapitalTier.EXPANDED,
+            capitalBreakdown = mapOf(
+                "Sample demonstration solar inverter & lithium battery kit" to 65000,
+                "Electrical multimeter, crimping tools & ladders" to 18000,
+                "EPRA technician certification & license" to 12000,
+                "Marketing flyers & local demo booth" to 8000
+            ),
+            estimatedDailyRevenueKes = 4000..12000,
+            estimatedMonthlyProfitKes = 60000..180000,
+            paybackPeriod = "2 - 3 months",
+            idealLocations = listOf(EnvironmentType.PERI_URBAN, EnvironmentType.RURAL, EnvironmentType.URBAN),
+            businessModel = BusinessModelType.HYBRID,
+            riskLevel = RiskLevel.MEDIUM,
+            timeCommitment = TimeCommitment.FULL_TIME,
+            requiredEquipmentIds = listOf("hand_tools"),
+            equipmentNeeded = listOf("Digital multimeter & clamp meter", "Heavy-duty wire strippers & crimpers", "Safety harness & folding ladder", "Drill and mounting brackets"),
+            supplierAndSourcingGuidance = "Wholesale solar importers along Commercial Street and Dar es Salaam Road in Nairobi Industrial Area.",
+            pricingConsiderations = "Hardware markup is 20-25%; professional labor installation fees are KSh 15,000 - 35,000 per residential installation.",
+            marketingStrategy = "Set up live solar battery demonstrations outside town hardware stores during Saturday market days.",
+            competitorResearchGuidance = "Many solar installers offer poor after-sales support; guarantee free 6-month quarterly checkups to gain referrals.",
+            launchSteps = listOf(
+                "Complete EPRA Solar PV Class T2/T3 certification.",
+                "Partner with 2 wholesale hardware distributors in town.",
+                "Install a pilot demonstration system in a visible commercial premises.",
+                "Offer turnkey quote financing options through SACCOs and chamas."
+            ),
+            compliance = listOf(
+                ComplianceRequirement("EPRA Solar PV License", "EPRA Kenya", "KSh 5,000 - 10,000", "Mandatory statutory license for grid/off-grid solar installation", true),
+                ComplianceRequirement("County Single Business Permit", "County Revenue", "KSh 5,000 - 9,000", "Trade permit for technical contractor operations", true)
+            ),
+            mpesaTip = "Accept 60% equipment deposit prior to purchasing materials, with 40% balance upon successful commissioning.",
+            insiderTips = listOf(
+                "Solar water pumping for poultry and vegetable farms is currently booming; farmers recover installation costs in 6 months compared to petrol pumps.",
+                "Lithium LiFePO4 batteries have replaced lead-acid and command much higher customer satisfaction."
+            ),
+            risksAndMitigations = listOf(
+                "Roof damage liability" to "Always inspect roofing sheets with the homeowner before mounting brackets.",
+                "Equipment warranty claims" to "Only source Tier-1 solar panels with 10-year manufacturer warranties."
+            ),
+            lastReviewedDate = "October 2026",
+            rating = 4.6,
+            reviewCount = 54,
+            thumbnailType = "solar"
+        ),
+
+        BusinessIdea(
+            id = "fast_food_takeaway",
+            title = "Fast Food Takeaway",
+            shengTitle = "Hot Food & Fries Express",
+            category = SkillCategory.FOOD_HOSPITALITY,
+            interestArea = InterestArea.FOOD_BEVERAGE,
+            summary = "Quick-service takeaway offering crispy fries, seasoned fried chicken, burgers, bhajia, and refreshing juices at busy footfall corridors.",
+            problemBeingSolved = "Commuters and young workers need hot, tasty, affordable meals ready in under 3 minutes without sit-down restaurant delays.",
+            proposedSolution = "Hygienic open-kitchen counter preparing golden crispy potato fries, spicy bhajias, and tender chicken wings with signature sauces.",
+            targetCustomers = listOf("College students", "Boda riders & matatu crews", "Office workers on lunch breaks", "Evening estate commuters"),
+            matchedSkills = listOf("cooking_baking", "beverages"),
+            capitalMinKes = 15000,
+            capitalMaxKes = 60000,
+            capitalTier = CapitalTier.LOW,
+            capitalBreakdown = mapOf(
+                "Commercial deep fryer or stainless steel pan" to 12000,
+                "Fresh potato sack, cooking oil & chicken cuts" to 9000,
+                "Branded greaseproof packaging boxes" to 4000,
+                "County food hygiene cert & branding" to 5000
+            ),
+            estimatedDailyRevenueKes = 2500..7000,
+            estimatedMonthlyProfitKes = 25000..75000,
+            paybackPeriod = "3 - 5 weeks",
+            idealLocations = listOf(EnvironmentType.URBAN, EnvironmentType.PERI_URBAN),
+            businessModel = BusinessModelType.OFFLINE,
+            riskLevel = RiskLevel.LOW,
+            timeCommitment = TimeCommitment.FULL_TIME,
+            requiredEquipmentIds = listOf("kitchen"),
+            equipmentNeeded = listOf("Thermostatic deep fryer or gas cooker", "Potato chip cutter", "Stainless steel display food warmer", "Serving tongs & paper liners"),
+            supplierAndSourcingGuidance = "Potatoes directly from Kinangop or Marikiti wholesale market; bulk 20L cooking oil from edible oil wholesalers.",
+            pricingConsiderations = "Chips plate retails at KSh 100 - 150 (cost is KSh 45); 1/4 fried chicken combo at KSh 250 (cost is KSh 140). High volume creates handsome profit.",
+            marketingStrategy = "Free tasting toothpicks at lunchtime and mouthwatering sizzling sounds right at the storefront.",
+            competitorResearchGuidance = "Ensure your cooking oil is always fresh and clean; dark burnt oil ruins taste and repels return customers.",
+            launchSteps = listOf(
+                "Secure a high-visibility kiosk or veranda counter near bus stops.",
+                "Obtain County food handling certification.",
+                "Procure potato cutter, fryer, and fresh bulk ingredients.",
+                "Host an opening day half-price combo promotion."
+            ),
+            compliance = listOf(
+                ComplianceRequirement("Food Handlers Medical Certificate", "County Health", "KSh 1,000", "Annual medical checkup for food workers", true),
+                ComplianceRequirement("Single Business Permit", "County Revenue", "KSh 4,000 - 7,000", "Food & beverage kiosk license", true)
+            ),
+            mpesaTip = "Place a large laminated Pochi La Biashara number on the serving counter for rapid cashless payment.",
+            insiderTips = listOf(
+                "Double-frying your potatoes (blanching first at 160°C, then crisping at 190°C) produces world-class restaurant fries.",
+                "Offer signature garlic-mayo and chili dip for KSh 20 extra—it is 90% profit!"
+            ),
+            risksAndMitigations = listOf(
+                "Cooking oil price fluctuations" to "Buy 20L jerrycans in bulk when wholesale prices dip.",
+                "Perishable stock waste" to "Prep potatoes daily based on measured peak lunch and evening demand."
+            ),
+            lastReviewedDate = "October 2026",
+            rating = 4.3,
+            reviewCount = 85,
+            thumbnailType = "food"
+        ),
+
+        BusinessIdea(
+            id = "bakery_business",
+            title = "Bakery Business",
+            shengTitle = "Maandazi, Cakes & Pastry Bake",
+            category = SkillCategory.FOOD_HOSPITALITY,
+            interestArea = InterestArea.FOOD_BEVERAGE,
+            summary = "Artisanal bakery and snack enterprise delivering fluffy mandazis, meat pies, birthday cakes, banana loaves, and muffins to tea kiosks and estate homes.",
+            problemBeingSolved = "Local tea kiosks and busy parents lack access to freshly baked, moist pastries that are free from artificial preservatives.",
+            proposedSolution = "Consistent daily baking of warm breakfast pastries, wholesale mandazi supply to 10 local cafes, and customized weekend celebratory cakes.",
+            targetCustomers = listOf("Local breakfast cafes & tea kiosks", "Estate families & schoolchildren", "Birthday & wedding event organizers"),
+            matchedSkills = listOf("pastry_cakes", "cooking_baking"),
+            capitalMinKes = 30000,
+            capitalMaxKes = 120000,
+            capitalTier = CapitalTier.MEDIUM,
+            capitalBreakdown = mapOf(
+                "Commercial 2-deck electric/gas baking oven" to 28000,
+                "Planetary stand mixer & baking tins" to 14000,
+                "Flour, sugar, yeast, butter, eggs bulk inventory" to 10000,
+                "Display glass counter & packaging" to 8000
+            ),
+            estimatedDailyRevenueKes = 3000..9000,
+            estimatedMonthlyProfitKes = 40000..110000,
+            paybackPeriod = "2 - 3 months",
+            idealLocations = listOf(EnvironmentType.PERI_URBAN, EnvironmentType.URBAN),
+            businessModel = BusinessModelType.HYBRID,
+            riskLevel = RiskLevel.MEDIUM,
+            timeCommitment = TimeCommitment.FULL_TIME,
+            requiredEquipmentIds = listOf("kitchen"),
+            equipmentNeeded = listOf("Baking oven", "Heavy-duty electric mixer", "Assorted cake pans and muffin trays", "Cooling racks & pastry boxes"),
+            supplierAndSourcingGuidance = "Source baking flour in 50kg sacks from Unga Limited or Pembe distributors; buy margarine in 10kg cartons.",
+            pricingConsiderations = "Mandazis wholesale at KSh 8 and cafes sell at KSh 15. Custom 1kg birthday cakes cost KSh 600 to bake and sell at KSh 1,800 - 2,500.",
+            marketingStrategy = "Share short time-lapse cake frosting videos on TikTok and Instagram; supply 5 local kiosks every morning at 5:30 AM sharp.",
+            competitorResearchGuidance = "Kiosks switch bakery suppliers based on reliability; always deliver fresh warm pastries before the 6:00 AM breakfast rush.",
+            launchSteps = listOf(
+                "Acquire oven and trial recipe batches for signature mandazis and sponge cakes.",
+                "Secure daily morning supply commitments with 5 neighbourhood tea joints.",
+                "Design a clean digital birthday cake catalogue with photos and pricing.",
+                "Deliver fresh batches daily and reinvest revenue into packaging."
+            ),
+            compliance = listOf(
+                ComplianceRequirement("Food Handlers Certificate", "County Public Health", "KSh 1,000", "Food preparation statutory certificate", true),
+                ComplianceRequirement("Food Hygiene Permit", "County Government", "KSh 3,500 - 6,000", "Sanitary approval for baking premises", true)
+            ),
+            mpesaTip = "Request 50% commitment deposit via M-PESA for custom cake orders.",
+            insiderTips = listOf(
+                "Early bird advantage: supply kiosks before 6:00 AM when tea crowds gather.",
+                "Use real vanilla extract and fresh eggs; customers immediately taste the difference over commercial mass-produced bread."
+            ),
+            risksAndMitigations = listOf(
+                "Flour spoilage" to "Store flour sacks on raised wooden pallets off the ground in dry ventilated conditions.",
+                "Power cuts during baking" to "Use a hybrid gas-electric oven or maintain an LPG backup cylinder."
+            ),
+            lastReviewedDate = "October 2026",
+            rating = 4.4,
+            reviewCount = 110,
+            thumbnailType = "bakery"
+        ),
+
+        BusinessIdea(
+            id = "juice_smoothie_bar",
+            title = "Juice and Smoothie Bar",
+            shengTitle = "Fresh Fruit Blends & Smoothies",
+            category = SkillCategory.FOOD_HOSPITALITY,
+            interestArea = InterestArea.FOOD_BEVERAGE,
+            summary = "Freshly extracted sugarcane, tropical fruit smoothies, cold-pressed detox juices, and fruit salad bowls served to health-conscious urban shoppers.",
+            problemBeingSolved = "Urban workers drink sugary commercial sodas because pure, freshly squeezed fruit juices are scarce and overpriced.",
+            proposedSolution = "Quick-blend health bar pressing cold sugarcane with ginger and lime, mango-passion blends, and avocado-banana smoothies on demand.",
+            targetCustomers = listOf("Gym enthusiasts & athletes", "Office workers wanting healthy lunches", "Shoppers in busy malls and market avenues"),
+            matchedSkills = listOf("beverages", "cooking_baking"),
+            capitalMinKes = 12000,
+            capitalMaxKes = 45000,
+            capitalTier = CapitalTier.LOW,
+            capitalBreakdown = mapOf(
+                "Heavy-duty commercial blender (2200W)" to 8500,
+                "Insulated ice chest & glass dispenser" to 4000,
+                "Fresh wholesale fruit stock & bio cups" to 5500,
+                "Branded pop-up stall sign" to 3000
+            ),
+            estimatedDailyRevenueKes = 2000..5500,
+            estimatedMonthlyProfitKes = 20000..55000,
+            paybackPeriod = "3 - 5 weeks",
+            idealLocations = listOf(EnvironmentType.URBAN, EnvironmentType.PERI_URBAN),
+            businessModel = BusinessModelType.OFFLINE,
+            riskLevel = RiskLevel.LOW,
+            timeCommitment = TimeCommitment.FULL_TIME,
+            requiredEquipmentIds = listOf("kitchen"),
+            equipmentNeeded = listOf("Heavy-duty high-wattage blender", "Sugarcane squeezer or cold press juicer", "Stainless steel counter & chopping board", "Takeaway cups & paper straws"),
+            supplierAndSourcingGuidance = "Wholesale fruits from Marikiti (Wakulima) or Kangemi markets early morning at 40% lower costs than supermarkets.",
+            pricingConsiderations = "Cost per 400ml cup is KSh 35 - 50. Sells briskly at KSh 100 - 150 (over 150% profit margin).",
+            marketingStrategy = "Display vibrant whole pineapples, watermelons, and citrus on the counter; offer free 50ml shot samples to passersby.",
+            competitorResearchGuidance = "Never add artificial water or refined sugar; 100% natural pure fruit flavor is your competitive moat.",
+            launchSteps = listOf(
+                "Source heavy-duty commercial blender from Luthuli Avenue.",
+                "Set up supply relationships with reliable Wakulima fruit wholesalers.",
+                "Position near a fitness center, hospital, or busy commercial walkway.",
+                "Promote 5 signature blends (e.g. Detox Glow, Tropical Energy)."
+            ),
+            compliance = listOf(
+                ComplianceRequirement("Food Handlers Health Cert", "County Health Dept", "KSh 1,000", "Annual medical screening", true),
+                ComplianceRequirement("Vendor Permit", "County Government", "KSh 3,000", "Municipal trade authorization", true)
+            ),
+            mpesaTip = "Have your Pochi La Biashara code prominently displayed right at the blending counter.",
+            insiderTips = listOf(
+                "Sugarcane juice with ginger and lime is high-profit: 1 stalk of sugarcane (KSh 30) yields 3 cups selling for KSh 300 total!",
+                "Freeze ripe bananas and mango chunks; blending them frozen gives a rich, creamy soft-serve ice cream texture without dairy."
+            ),
+            risksAndMitigations = listOf(
+                "Fruit ripening and spoilage" to "Chop and freeze ripe fruits in portion ziplock bags immediately.",
+                "Power cuts" to "Maintain a 12V battery inverter to power the blender during blackouts."
+            ),
+            lastReviewedDate = "October 2026",
+            rating = 4.2,
+            reviewCount = 76,
+            thumbnailType = "juice"
+        ),
+
+        BusinessIdea(
+            id = "catering_services",
+            title = "Catering Services",
+            shengTitle = "Events & Wedding Catering",
+            category = SkillCategory.FOOD_HOSPITALITY,
+            interestArea = InterestArea.FOOD_BEVERAGE,
+            summary = "On-demand catering for corporate boardroom lunches, weddings, dowry ruracios, church fellowships, and birthday parties with authentic Kenyan delicacies.",
+            problemBeingSolved = "Event hosts are overwhelmed preparing food for 50-200 guests and want professional, reliable, delicious culinary execution without stress.",
+            proposedSolution = "Full-service catering team preparing pilau, chapati, mukimo, goat stew, grilled meats, and crisp salads delivered warm with chafing dish setups.",
+            targetCustomers = listOf("Corporate HR departments for team retreats", "Wedding & ruracio families", "Chama anniversary celebrations"),
+            matchedSkills = listOf("cooking_baking", "events_decor"),
+            capitalMinKes = 40000,
+            capitalMaxKes = 150000,
+            capitalTier = CapitalTier.MEDIUM,
+            capitalBreakdown = mapOf(
+                "Stainless steel chafing dishes set (6 units)" to 24000,
+                "Large cooking sufurias & catering utensils" to 15000,
+                "Uniform aprons, chef hats & serving gloves" to 6000,
+                "Portfolio food tasting photo session & flyers" to 7000
+            ),
+            estimatedDailyRevenueKes = 4000..15000,
+            estimatedMonthlyProfitKes = 50000..140000,
+            paybackPeriod = "1.5 - 2 months",
+            idealLocations = listOf(EnvironmentType.URBAN, EnvironmentType.PERI_URBAN),
+            businessModel = BusinessModelType.HYBRID,
+            riskLevel = RiskLevel.MEDIUM,
+            timeCommitment = TimeCommitment.FLEXIBLE,
+            requiredEquipmentIds = listOf("kitchen"),
+            equipmentNeeded = listOf("Chafing dishes with fuel burners", "Heavy-duty 50-liter aluminum sufurias", "Serving ladles & tongs", "Insulated hot food transport boxes"),
+            supplierAndSourcingGuidance = "Wholesale meat from Dagoretti or Njiru slaughterhouses; rice and spices from Nyamakima.",
+            pricingConsiderations = "Charge KSh 500 - 850 per guest plate. An event with 100 guests = KSh 65,000 gross revenue with KSh 30,000 net profit per weekend!",
+            marketingStrategy = "Photograph every event spread, share customer video testimonials on TikTok, and partner with local event planners and churches.",
+            competitorResearchGuidance = "Portion control and punctuality are everything: serve food exactly on time with warm, generous portions.",
+            launchSteps = listOf(
+                "Cater a family event or church fellowship at food cost to build photography portfolio.",
+                "Acquire 6 stainless steel chafing dishes and serving gear.",
+                "Print high-quality laminated event menu packages.",
+                "Network with 3 wedding planners and photographers in your area."
+            ),
+            compliance = listOf(
+                ComplianceRequirement("Catering Health Clearance", "County Public Health", "KSh 1,500", "Food production and transport inspection", true),
+                ComplianceRequirement("Business Name Registration", "eCitizen BRS", "KSh 950", "Formal business invoice entity", false)
+            ),
+            mpesaTip = "Require 70% M-PESA deposit upon booking to buy ingredients, balance paid before serving.",
+            insiderTips = listOf(
+                "Chapati and pilau quality defines your reputation: master soft layered chapatis and authentic coastal pilau.",
+                "Always cook for 10% more guests than the client paid for to prevent the nightmare of food running out."
+            ),
+            risksAndMitigations = listOf(
+                "Guest count surprises" to "Include strict guest plate headcount in written agreements.",
+                "Transport delays" to "Arrive at the event venue at least 2 hours before scheduled mealtime."
+            ),
+            lastReviewedDate = "October 2026",
+            rating = 4.5,
+            reviewCount = 62,
+            thumbnailType = "catering"
+        ),
+
+        BusinessIdea(
             id = "mitumba_thrift",
             title = "Curated Instagram & Estate Mitumba Thrift",
             shengTitle = "Kamera Thrift Store",
@@ -882,6 +1346,30 @@ class HustleRepository(context: Context) {
             )
         }
         return list
+    }
+
+    // Onboarding State
+    fun isOnboardingCompleted(): Boolean {
+        return prefs.getBoolean("onboarding_completed", false)
+    }
+
+    fun setOnboardingCompleted(completed: Boolean) {
+        prefs.edit().putBoolean("onboarding_completed", completed).apply()
+    }
+
+    fun getUserProfileName(): String {
+        return prefs.getString("user_profile_name", "John Doe") ?: "John Doe"
+    }
+
+    fun getUserProfileEmail(): String {
+        return prefs.getString("user_profile_email", "john.doe@example.com") ?: "john.doe@example.com"
+    }
+
+    fun setUserProfile(name: String, email: String) {
+        prefs.edit()
+            .putString("user_profile_name", name)
+            .putString("user_profile_email", email)
+            .apply()
     }
 
     // Data wipe / privacy clear

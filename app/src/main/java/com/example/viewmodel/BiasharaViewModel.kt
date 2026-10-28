@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
+import com.example.data.UserActivityTracker
+import com.example.network.DjangoSyncManager
+
 enum class DiscoveryMode {
     QUICK,
     DETAILED,
@@ -21,7 +24,7 @@ enum class DiscoveryMode {
 
 data class BiasharaUiState(
     val allSkills: List<Skill> = emptyList(),
-    val selectedSkillIds: Set<String> = setOf("graphic_design", "social_media"),
+    val selectedSkillIds: Set<String> = setOf("horticulture", "cooking_baking"),
     val customSkills: List<String> = emptyList(),
     val selectedInterests: Set<InterestArea> = emptySet(),
     val exactCapitalKes: Int? = null,
@@ -32,6 +35,12 @@ data class BiasharaUiState(
     val riskTolerance: RiskLevel? = null,
     val preferredBusinessModel: BusinessModelType? = null,
     val discoveryMode: DiscoveryMode = DiscoveryMode.QUICK,
+
+    // Onboarding & Profile State
+    val isOnboardingCompleted: Boolean = false,
+    val userProfileName: String = "John Doe",
+    val userProfileEmail: String = "john.doe@example.com",
+    val ideasExploredCount: Int = 3,
 
     // Match Results
     val matchedIdeas: List<BusinessIdea> = emptyList(),
@@ -46,6 +55,12 @@ data class BiasharaUiState(
     val savedIdeaIds: Set<String> = emptySet(),
     val comparedIdeaIds: Set<String> = emptySet(),
     val selectedDetailIdea: BusinessIdea? = null,
+
+    // User Activity Tracking & Django State
+    val userActivities: List<UserActivityEvent> = emptyList(),
+    val isSyncingToDjango: Boolean = false,
+    val djangoBackendUrl: String = "http://10.0.2.2:8000",
+    val djangoConnectionStatus: String = "Offline Mode (Local Storage)",
 
     // Journey & Plans
     val defaultJourneyTasks: List<JourneyTask> = emptyList(),
@@ -81,6 +96,8 @@ data class BiasharaUiState(
 class BiasharaViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = HustleRepository(application.applicationContext)
+    private val activityTracker = UserActivityTracker(application.applicationContext)
+    private val djangoSyncManager = DjangoSyncManager(application.applicationContext, activityTracker)
 
     private val _uiState = MutableStateFlow(BiasharaUiState())
     val uiState: StateFlow<BiasharaUiState> = _uiState.asStateFlow()
@@ -100,6 +117,11 @@ class BiasharaViewModel(application: Application) : AndroidViewModel(application
         val ideas = repository.businessIdeas
         val docs = repository.getDocumentLibrary()
         val tasks = repository.defaultJourneyTasks
+        val onboardingDone = repository.isOnboardingCompleted()
+        val userName = repository.getUserProfileName()
+        val userEmail = repository.getUserProfileEmail()
+        val activities = activityTracker.getAllEvents()
+        val djangoUrl = activityTracker.djangoBackendUrl
 
         _uiState.update { current ->
             current.copy(
@@ -112,7 +134,12 @@ class BiasharaViewModel(application: Application) : AndroidViewModel(application
                 youthFundGuides = funds,
                 documentLibrary = docs,
                 defaultJourneyTasks = tasks,
-                mentorshipRequests = mentorshipReqs
+                mentorshipRequests = mentorshipReqs,
+                isOnboardingCompleted = onboardingDone,
+                userProfileName = userName,
+                userProfileEmail = userEmail,
+                userActivities = activities,
+                djangoBackendUrl = djangoUrl
             )
         }
         recalculateMatches()
@@ -225,19 +252,131 @@ class BiasharaViewModel(application: Application) : AndroidViewModel(application
         _uiState.update { it.copy(categoryFilter = category) }
     }
 
+    fun completeOnboarding(
+        name: String = "John Doe",
+        email: String = "john.doe@example.com",
+        selectedSkillIds: Set<String> = emptySet(),
+        capitalKes: Int? = null
+    ) {
+        repository.setOnboardingCompleted(true)
+        repository.setUserProfile(name, email)
+        _uiState.update {
+            it.copy(
+                isOnboardingCompleted = true,
+                userProfileName = name,
+                userProfileEmail = email,
+                selectedSkillIds = if (selectedSkillIds.isNotEmpty()) selectedSkillIds else it.selectedSkillIds,
+                exactCapitalKes = capitalKes ?: it.exactCapitalKes
+            )
+        }
+        recalculateMatches()
+        logActivity(
+            ActivityType.COMPLETE_ONBOARDING,
+            targetTitle = "Completed Onboarding Wizard",
+            metadata = mapOf(
+                "name" to name,
+                "skills_count" to selectedSkillIds.size.toString(),
+                "capital" to (capitalKes?.toString() ?: "None")
+            )
+        )
+    }
+
+    fun resetOnboarding() {
+        repository.setOnboardingCompleted(false)
+        _uiState.update { it.copy(isOnboardingCompleted = false) }
+    }
+
+    fun logActivity(
+        type: ActivityType,
+        targetId: String? = null,
+        targetTitle: String? = null,
+        category: String? = null,
+        metadata: Map<String, String> = emptyMap()
+    ) {
+        activityTracker.logEvent(type, targetId, targetTitle, category, metadata)
+        _uiState.update {
+            it.copy(userActivities = activityTracker.getAllEvents())
+        }
+        // Background sync to Django if available
+        viewModelScope.launch {
+            djangoSyncManager.syncTrackingEvents()
+        }
+    }
+
+    fun triggerDjangoSync() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSyncingToDjango = true) }
+            val (count, msg) = djangoSyncManager.syncTrackingEvents()
+            _uiState.update {
+                it.copy(
+                    isSyncingToDjango = false,
+                    userActivities = activityTracker.getAllEvents(),
+                    userNotification = msg
+                )
+            }
+        }
+    }
+
+    fun testDjangoConnection() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSyncingToDjango = true) }
+            val (success, status) = djangoSyncManager.testConnection()
+            _uiState.update {
+                it.copy(
+                    isSyncingToDjango = false,
+                    djangoConnectionStatus = status,
+                    userNotification = status
+                )
+            }
+        }
+    }
+
+    fun updateDjangoBackendUrl(url: String) {
+        activityTracker.djangoBackendUrl = url
+        _uiState.update { it.copy(djangoBackendUrl = url) }
+    }
+
+    fun saveUserProfile(name: String, email: String) {
+        repository.setUserProfile(name, email)
+        _uiState.update { it.copy(userProfileName = name, userProfileEmail = email) }
+    }
+
     fun selectDetailIdea(idea: BusinessIdea?) {
         _uiState.update { it.copy(selectedDetailIdea = idea) }
+        idea?.let {
+            logActivity(
+                ActivityType.VIEW_IDEA,
+                targetId = it.id,
+                targetTitle = it.title,
+                category = it.category.displayName,
+                metadata = mapOf(
+                    "capital" to "KSh ${it.capitalMinKes} - ${it.capitalMaxKes}",
+                    "profit" to "KSh ${it.estimatedMonthlyProfitKes.first} - ${it.estimatedMonthlyProfitKes.last}"
+                )
+            )
+        }
     }
 
     fun toggleSaveIdea(ideaId: String) {
         viewModelScope.launch {
             val isNowSaved = repository.toggleSaveIdea(ideaId)
             val newSaved = repository.getSavedIdeaIds()
+            val idea = _uiState.value.allIdeas.find { it.id == ideaId }
             _uiState.update { current ->
                 current.copy(
                     savedIdeaIds = newSaved,
-                    userNotification = if (isNowSaved) "Added to your Launchpad!" else "Removed from Launchpad"
+                    userNotification = if (isNowSaved) "Saved to your list!" else "Removed from saved ideas"
                 )
+            }
+            if (isNowSaved) {
+                logActivity(
+                    ActivityType.SAVE_IDEA,
+                    targetId = ideaId,
+                    targetTitle = idea?.title,
+                    category = idea?.category?.displayName
+                )
+            } else {
+                logActivity(ActivityType.UNSAVE_IDEA, targetId = ideaId, targetTitle = idea?.title)
             }
         }
     }

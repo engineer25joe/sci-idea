@@ -1,13 +1,14 @@
 package com.example.model
 
 enum class SkillCategory(val displayName: String, val iconName: String) {
-    DIGITAL_TECH("Digital & Tech", "computer"),
+    DIGITAL_TECH("Technology", "computer"),
     VOCATIONAL_TRADES("Vocational & Trades", "build"),
-    AGRIBUSINESS("Agri-business & Farming", "agriculture"),
-    FOOD_HOSPITALITY("Food & Culinary", "restaurant"),
-    SERVICES_LOGISTICS("Services & Logistics", "local_shipping"),
-    BEAUTY_FASHION("Beauty, Hair & Fashion", "face"),
-    RETAIL_COMMERCE("Retail & Sales", "storefront")
+    AGRIBUSINESS("Agriculture", "agriculture"),
+    FOOD_HOSPITALITY("Food & Beverage", "restaurant"),
+    SERVICES_LOGISTICS("Services", "local_shipping"),
+    BEAUTY_FASHION("Beauty & Fashion", "face"),
+    RETAIL_COMMERCE("Retail & Trade", "storefront"),
+    MANUFACTURING("Manufacturing", "precision_manufacturing")
 }
 
 data class Skill(

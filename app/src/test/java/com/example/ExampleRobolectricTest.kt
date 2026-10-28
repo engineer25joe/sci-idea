@@ -179,4 +179,48 @@ class ExampleRobolectricTest {
         val compared = repository.getComparedIdeaIds()
         assertTrue("Compare list should not exceed 3 items", compared.size <= 3)
     }
+
+    @Test
+    fun `onboarding state and user profile persist correctly`() {
+        assertFalse("Onboarding should be false by default in fresh repo", repository.isOnboardingCompleted())
+
+        repository.setOnboardingCompleted(true)
+        assertTrue(repository.isOnboardingCompleted())
+
+        repository.setUserProfile("Jane Wanjiku", "jane@biashara.co.ke")
+        assertEquals("Jane Wanjiku", repository.getUserProfileName())
+        assertEquals("jane@biashara.co.ke", repository.getUserProfileEmail())
+    }
+
+    @Test
+    fun `user activity tracker records and retrieves events`() {
+        val tracker = com.example.data.UserActivityTracker(context)
+        tracker.clearAllEvents()
+
+        val event = tracker.logEvent(
+            type = com.example.model.ActivityType.VIEW_IDEA,
+            targetId = "urban_farming",
+            targetTitle = "Urban Vegetable Farming",
+            category = "Agriculture"
+        )
+
+        assertNotNull(event.id)
+        val allEvents = tracker.getAllEvents()
+        assertEquals(1, allEvents.size)
+        assertEquals("VIEW_IDEA", allEvents.first().eventType)
+        assertEquals("Urban Vegetable Farming", allEvents.first().targetTitle)
+    }
+
+    @Test
+    fun `mockup business ideas are present and properly configured`() {
+        val urbanFarming = repository.businessIdeas.find { it.id == "urban_farming" }
+        assertNotNull("Urban vegetable farming must be present", urbanFarming)
+        assertEquals("Urban Vegetable Farming", urbanFarming!!.title)
+        assertEquals(4.5, urbanFarming.rating, 0.01)
+        assertEquals(10000, urbanFarming.capitalMinKes)
+
+        val phoneAccessories = repository.businessIdeas.find { it.id == "phone_accessories" }
+        assertNotNull("Phone accessories shop must be present", phoneAccessories)
+        assertEquals(4.2, phoneAccessories!!.rating, 0.01)
+    }
 }

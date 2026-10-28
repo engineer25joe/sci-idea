@@ -60,5 +60,8 @@ data class BusinessIdea(
     val isSaved: Boolean = false,
     val matchScore: Int = 0,
     val feasibilityGroup: FeasibilityGroup = FeasibilityGroup.READY_NOW,
-    val explanation: MatchExplanation? = null
+    val explanation: MatchExplanation? = null,
+    val rating: Double = 4.5,
+    val reviewCount: Int = 120,
+    val thumbnailType: String = "general"
 )

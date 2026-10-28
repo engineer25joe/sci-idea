@@ -20,7 +20,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.model.SkillCategory
 import com.example.ui.components.AboutAppDialog
+import com.example.ui.components.KenyanGreen
 import com.example.ui.screens.*
 import com.example.ui.theme.*
 import com.example.viewmodel.BiasharaViewModel
@@ -32,11 +34,10 @@ enum class Screen(
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector
 ) {
-    MATCHER("matcher", "Matcher", Icons.Filled.Psychology, Icons.Outlined.Psychology),
-    EXPLORE("explore", "Catalogue", Icons.Filled.Storefront, Icons.Outlined.Storefront),
-    CALCULATOR("calculator", "Calculator", Icons.Filled.Calculate, Icons.Outlined.Calculate),
-    STORIES("stories", "Stories", Icons.Filled.EmojiEvents, Icons.Outlined.EmojiEvents),
-    LAUNCHPAD("launchpad", "Launchpad", Icons.Filled.RocketLaunch, Icons.Outlined.RocketLaunch)
+    HOME("home", "Home", Icons.Filled.Home, Icons.Outlined.Home),
+    EXPLORE("explore", "Explore", Icons.Filled.Explore, Icons.Outlined.Explore),
+    SAVED("saved", "Saved", Icons.Filled.Bookmark, Icons.Outlined.BookmarkBorder),
+    PROFILE("profile", "Profile", Icons.Filled.Person, Icons.Outlined.Person)
 }
 
 class MainActivity : ComponentActivity() {
@@ -50,7 +51,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             BiasharaTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-                var currentScreen by remember { mutableStateOf(Screen.MATCHER) }
+                var currentScreen by remember { mutableStateOf(Screen.HOME) }
+                var isSearching by remember { mutableStateOf(false) }
+                var selectedCategoryFilter by remember { mutableStateOf<SkillCategory?>(null) }
+                var showCalculatorScreen by remember { mutableStateOf(false) }
                 val snackbarHostState = remember { SnackbarHostState() }
                 val coroutineScope = rememberCoroutineScope()
 
@@ -64,169 +68,212 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                // Handle hardware back button smoothly
-                val hasOpenSheet = uiState.selectedDetailIdea != null ||
+                // Smooth hardware back button handling
+                val hasActiveOverlay = isSearching ||
+                        uiState.selectedDetailIdea != null ||
+                        showCalculatorScreen ||
                         uiState.showAboutDialog ||
                         uiState.showCompareSheet ||
                         uiState.showJourneySheet ||
                         uiState.showPlanDraftSheet
 
-                BackHandler(enabled = hasOpenSheet || currentScreen != Screen.MATCHER) {
+                BackHandler(enabled = hasActiveOverlay || currentScreen != Screen.HOME) {
                     when {
                         uiState.selectedDetailIdea != null -> viewModel.selectDetailIdea(null)
+                        isSearching -> isSearching = false
+                        showCalculatorScreen -> showCalculatorScreen = false
                         uiState.showAboutDialog -> viewModel.closeAboutDialog()
                         uiState.showCompareSheet -> viewModel.closeCompareSheet()
                         uiState.showJourneySheet -> viewModel.closeJourneySheet()
                         uiState.showPlanDraftSheet -> viewModel.closeBusinessPlanDraft()
-                        currentScreen != Screen.MATCHER -> currentScreen = Screen.MATCHER
+                        currentScreen != Screen.HOME -> currentScreen = Screen.HOME
                     }
                 }
 
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    snackbarHost = { SnackbarHost(snackbarHostState) },
-                    bottomBar = {
-                        NavigationBar(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            tonalElevation = 6.dp,
-                            windowInsets = WindowInsets.navigationBars,
-                            modifier = Modifier.testTag("bottom_nav_bar")
-                        ) {
-                            Screen.values().forEach { screen ->
-                                val isSelected = currentScreen == screen
-                                NavigationBarItem(
-                                    selected = isSelected,
-                                    onClick = { currentScreen = screen },
-                                    icon = {
-                                        Icon(
-                                            imageVector = if (isSelected) screen.selectedIcon else screen.unselectedIcon,
-                                            contentDescription = screen.title
-                                        )
-                                    },
-                                    label = {
-                                        Text(
-                                            text = screen.title,
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                                        )
-                                    },
-                                    colors = NavigationBarItemDefaults.colors(
-                                        selectedIconColor = SciBluePrimary,
-                                        selectedTextColor = SciBluePrimary,
-                                        indicatorColor = SciBlueContainer,
-                                        unselectedIconColor = TextMuted,
-                                        unselectedTextColor = TextMuted
-                                    ),
-                                    modifier = Modifier.testTag("nav_${screen.route}")
-                                )
+                if (!uiState.isOnboardingCompleted) {
+                    // First-Time User Onboarding Flow (Screens 1 to 4)
+                    OnboardingFlow(
+                        availableSkills = uiState.allSkills,
+                        onFinishOnboarding = { name, email, selectedSkills, capital ->
+                            viewModel.completeOnboarding(
+                                name = name,
+                                email = email,
+                                selectedSkillIds = selectedSkills,
+                                capitalKes = capital
+                            )
+                        }
+                    )
+                } else {
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        snackbarHost = { SnackbarHost(snackbarHostState) },
+                        bottomBar = {
+                            NavigationBar(
+                                containerColor = Color.White,
+                                tonalElevation = 6.dp,
+                                windowInsets = WindowInsets.navigationBars,
+                                modifier = Modifier.testTag("bottom_nav_bar")
+                            ) {
+                                Screen.values().forEach { screen ->
+                                    val isSelected = currentScreen == screen && !isSearching
+                                    NavigationBarItem(
+                                        selected = isSelected,
+                                        onClick = {
+                                            isSearching = false
+                                            currentScreen = screen
+                                        },
+                                        icon = {
+                                            Icon(
+                                                imageVector = if (isSelected) screen.selectedIcon else screen.unselectedIcon,
+                                                contentDescription = screen.title
+                                            )
+                                        },
+                                        label = {
+                                            Text(
+                                                text = screen.title,
+                                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                            )
+                                        },
+                                        colors = NavigationBarItemDefaults.colors(
+                                            selectedIconColor = KenyanGreen,
+                                            selectedTextColor = KenyanGreen,
+                                            indicatorColor = Color(0xFFE8F5E9),
+                                            unselectedIconColor = Color(0xFF9CA3AF),
+                                            unselectedTextColor = Color(0xFF6B7280)
+                                        ),
+                                        modifier = Modifier.testTag("nav_${screen.route}")
+                                    )
+                                }
                             }
                         }
-                    }
-                ) { innerPadding ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                    ) {
-                        AnimatedContent(
-                            targetState = currentScreen,
-                            transitionSpec = {
-                                fadeIn() togetherWith fadeOut()
-                            },
-                            label = "ScreenTransition"
-                        ) { target ->
-                            when (target) {
-                                Screen.MATCHER -> MatcherScreen(
+                    ) { innerPadding ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                        ) {
+                            if (isSearching) {
+                                // Screen 8: Search Results Screen
+                                SearchResultsScreen(
                                     uiState = uiState,
                                     viewModel = viewModel,
-                                    onNavigateToTrends = { currentScreen = Screen.STORIES },
-                                    onNavigateToStories = { currentScreen = Screen.STORIES }
+                                    onBack = { isSearching = false },
+                                    onSelectIdea = { idea -> viewModel.selectDetailIdea(idea) }
                                 )
-
-                                Screen.EXPLORE -> ExploreScreen(
+                            } else if (showCalculatorScreen) {
+                                CalculatorScreen(
                                     uiState = uiState,
                                     viewModel = viewModel
                                 )
+                            } else {
+                                AnimatedContent(
+                                    targetState = currentScreen,
+                                    transitionSpec = { fadeIn() togetherWith fadeOut() },
+                                    label = "MainScreenTransition"
+                                ) { target ->
+                                    when (target) {
+                                        Screen.HOME -> HomeDashboardScreen(
+                                            uiState = uiState,
+                                            viewModel = viewModel,
+                                            onNavigateToExplore = { cat ->
+                                                selectedCategoryFilter = cat
+                                                currentScreen = Screen.EXPLORE
+                                            },
+                                            onNavigateToSearch = { isSearching = true },
+                                            onSelectIdea = { idea -> viewModel.selectDetailIdea(idea) }
+                                        )
 
-                                Screen.CALCULATOR -> CalculatorScreen(
-                                    uiState = uiState,
-                                    viewModel = viewModel
-                                )
+                                        Screen.EXPLORE -> BrowseIdeasScreen(
+                                            uiState = uiState,
+                                            viewModel = viewModel,
+                                            initialCategory = selectedCategoryFilter,
+                                            onBack = { currentScreen = Screen.HOME },
+                                            onSelectIdea = { idea -> viewModel.selectDetailIdea(idea) }
+                                        )
 
-                                Screen.STORIES -> SuccessStoriesScreen(
-                                    uiState = uiState,
-                                    viewModel = viewModel
-                                )
+                                        Screen.SAVED -> SavedIdeasScreen(
+                                            uiState = uiState,
+                                            viewModel = viewModel,
+                                            onBack = { currentScreen = Screen.HOME },
+                                            onSelectIdea = { idea -> viewModel.selectDetailIdea(idea) },
+                                            onNavigateToExplore = { currentScreen = Screen.EXPLORE }
+                                        )
 
-                                Screen.LAUNCHPAD -> LaunchpadScreen(
-                                    uiState = uiState,
-                                    viewModel = viewModel
+                                        Screen.PROFILE -> ProfileScreen(
+                                            uiState = uiState,
+                                            viewModel = viewModel,
+                                            onNavigateToSaved = { currentScreen = Screen.SAVED },
+                                            onNavigateToStories = {
+                                                // Quick jump to explore
+                                                currentScreen = Screen.EXPLORE
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
+                            // Screen 7: Idea Details Screen (opened whenever an idea is selected)
+                            uiState.selectedDetailIdea?.let { idea ->
+                                IdeaDetailsScreen(
+                                    idea = idea,
+                                    isSaved = uiState.savedIdeaIds.contains(idea.id),
+                                    onBack = { viewModel.selectDetailIdea(null) },
+                                    onToggleSave = { viewModel.toggleSaveIdea(idea.id) },
+                                    onOpenCalculator = {
+                                        viewModel.loadIdeaIntoCalculator(idea)
+                                        showCalculatorScreen = true
+                                    },
+                                    onOpenBusinessPlan = {
+                                        viewModel.openBusinessPlanDraft(idea)
+                                    },
+                                    onStartJourney = {
+                                        viewModel.openJourneyForIdea(idea)
+                                    }
                                 )
                             }
-                        }
 
-                        // Detail BottomSheet for selected Idea
-                        uiState.selectedDetailIdea?.let { idea ->
-                            IdeaDetailSheet(
-                                idea = idea,
-                                isSaved = uiState.savedIdeaIds.contains(idea.id),
-                                isCompared = uiState.comparedIdeaIds.contains(idea.id),
-                                onDismiss = { viewModel.selectDetailIdea(null) },
-                                onToggleSave = { viewModel.toggleSaveIdea(idea.id) },
-                                onToggleCompare = { viewModel.toggleCompareIdea(idea.id) },
-                                onOpenCalculator = {
-                                    viewModel.loadIdeaIntoCalculator(idea)
-                                    currentScreen = Screen.CALCULATOR
-                                },
-                                onBuildBusinessPlan = {
-                                    viewModel.openBusinessPlanDraft(idea)
-                                },
-                                onStartJourney = {
-                                    viewModel.openJourneyForIdea(idea)
-                                }
-                            )
-                        }
+                            // 6-Stage Hustle Journey Sheet
+                            if (uiState.showJourneySheet && uiState.activeJourneyIdea != null && uiState.activeJourneyProgress != null) {
+                                JourneySheet(
+                                    idea = uiState.activeJourneyIdea!!,
+                                    progress = uiState.activeJourneyProgress!!,
+                                    tasks = uiState.defaultJourneyTasks,
+                                    onToggleTask = { taskId -> viewModel.toggleJourneyTask(taskId) },
+                                    onSaveNotes = { notes -> viewModel.updateJourneyNotes(notes) },
+                                    onOpenBusinessPlan = {
+                                        viewModel.openBusinessPlanDraft(uiState.activeJourneyIdea!!)
+                                    },
+                                    onDismiss = { viewModel.closeJourneySheet() }
+                                )
+                            }
 
-                        // 6-Stage Hustle Journey Sheet
-                        if (uiState.showJourneySheet && uiState.activeJourneyIdea != null && uiState.activeJourneyProgress != null) {
-                            JourneySheet(
-                                idea = uiState.activeJourneyIdea!!,
-                                progress = uiState.activeJourneyProgress!!,
-                                tasks = uiState.defaultJourneyTasks,
-                                onToggleTask = { taskId -> viewModel.toggleJourneyTask(taskId) },
-                                onSaveNotes = { notes -> viewModel.updateJourneyNotes(notes) },
-                                onOpenBusinessPlan = {
-                                    viewModel.openBusinessPlanDraft(uiState.activeJourneyIdea!!)
-                                },
-                                onDismiss = { viewModel.closeJourneySheet() }
-                            )
-                        }
+                            // SCI Business Plan Draft Sheet
+                            if (uiState.showPlanDraftSheet && uiState.activeBusinessPlanDraft != null) {
+                                BusinessPlanDialog(
+                                    draft = uiState.activeBusinessPlanDraft!!,
+                                    onSaveDraft = { updated -> viewModel.updateBusinessPlanDraft(updated) },
+                                    onDismiss = { viewModel.closeBusinessPlanDraft() }
+                                )
+                            }
 
-                        // SCI Business Plan Draft Sheet
-                        if (uiState.showPlanDraftSheet && uiState.activeBusinessPlanDraft != null) {
-                            BusinessPlanDialog(
-                                draft = uiState.activeBusinessPlanDraft!!,
-                                onSaveDraft = { updated -> viewModel.updateBusinessPlanDraft(updated) },
-                                onDismiss = { viewModel.closeBusinessPlanDraft() }
-                            )
-                        }
+                            // Compare Sheet
+                            if (uiState.showCompareSheet) {
+                                val comparedList = uiState.allIdeas.filter { uiState.comparedIdeaIds.contains(it.id) }
+                                CompareSheet(
+                                    ideas = comparedList,
+                                    onRemoveFromCompare = { id -> viewModel.toggleCompareIdea(id) },
+                                    onSelectIdea = { idea -> viewModel.selectDetailIdea(idea) },
+                                    onDismiss = { viewModel.closeCompareSheet() }
+                                )
+                            }
 
-                        // Compare Sheet
-                        if (uiState.showCompareSheet) {
-                            val comparedList = uiState.allIdeas.filter { uiState.comparedIdeaIds.contains(it.id) }
-                            CompareSheet(
-                                ideas = comparedList,
-                                onRemoveFromCompare = { id -> viewModel.toggleCompareIdea(id) },
-                                onSelectIdea = { idea -> viewModel.selectDetailIdea(idea) },
-                                onDismiss = { viewModel.closeCompareSheet() }
-                            )
-                        }
-
-                        // About Dialog
-                        if (uiState.showAboutDialog) {
-                            AboutAppDialog(
-                                onDismiss = { viewModel.closeAboutDialog() },
-                                onClearData = { viewModel.clearAllUserData() }
-                            )
+                            // About Dialog
+                            if (uiState.showAboutDialog) {
+                                AboutAppDialog(
+                                    onDismiss = { viewModel.closeAboutDialog() },
+                                    onClearData = { viewModel.clearAllUserData() }
+                                )
+                            }
                         }
                     }
                 }
