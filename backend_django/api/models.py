@@ -94,6 +94,11 @@ class UserActivityLog(models.Model):
 
     class Meta:
         ordering = ['-timestamp_ms']
-
+        constraints = [
+            models.UniqueConstraint(
+                fields=['device_id', 'event_id'],
+                name='unique_device_tracking_event'
+            )
+        ]
     def __str__(self):
         return f"[{self.event_type}] {self.target_title or self.target_id or 'General'} by {self.device_id}"

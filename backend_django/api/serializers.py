@@ -30,17 +30,34 @@ class TestimonialSerializer(serializers.ModelSerializer):
         ]
 
 class RemoteEventDtoSerializer(serializers.Serializer):
+    EVENT_TYPES = [
+        "VIEW_IDEA",
+        "SEARCH",
+        "FILTER_CATEGORY",
+        "SAVE_IDEA",
+        "UNSAVE_IDEA",
+        "USE_CALCULATOR",
+        "START_JOURNEY",
+        "COMPLETE_ONBOARDING",
+        "REQUEST_MENTORSHIP",
+        "VIEW_TRENDS",
+    ]
+
     event_id = serializers.CharField(max_length=100)
-    event_type = serializers.CharField(max_length=60)
+    event_type = serializers.ChoiceField(choices=EVENT_TYPES)
     target_id = serializers.CharField(max_length=100, allow_null=True, required=False)
     target_title = serializers.CharField(max_length=200, allow_null=True, required=False)
     category = serializers.CharField(max_length=100, allow_null=True, required=False)
-    timestamp_ms = serializers.IntegerField()
-    metadata = serializers.DictField(child=serializers.CharField(), required=False)
+    timestamp_ms = serializers.IntegerField(min_value=0)
+    metadata = serializers.DictField(
+        child=serializers.CharField(),
+        required=False
+    )
+
 
 class EventBatchRequestSerializer(serializers.Serializer):
     device_id = serializers.CharField(max_length=100)
-    events = RemoteEventDtoSerializer(many=True)
+    events = RemoteEventDtoSerializer(many=True, allow_empty=False, max_length=150)
 
 class UserActivityLogSerializer(serializers.ModelSerializer):
     class Meta:
