@@ -17,7 +17,7 @@ class UserActivityTracker(context: Context) {
         private const val KEY_EVENTS = "tracking_events_json"
         private const val KEY_DEVICE_ID = "tracking_device_id"
         private const val KEY_DJANGO_URL = "django_backend_url"
-        private const val DEFAULT_DJANGO_URL = "http://10.0.2.2:8000"
+        private const val DEFAULT_DJANGO_URL = "https://sci-idea-backend.onrender.com"
     }
 
     init {
