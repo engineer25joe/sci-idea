@@ -1,4 +1,21 @@
 import com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy
+import java.net.URI
+
+val approvedProductionApiUrl = providers.gradleProperty("sciIdeaProductionApiUrl")
+  .orElse(providers.environmentVariable("SCI_IDEA_PRODUCTION_API_URL"))
+  .orElse("https://sci-idea-backend.onrender.com/")
+  .get()
+val approvedProductionApiUri = runCatching { URI(approvedProductionApiUrl) }
+  .getOrElse { throw GradleException("Invalid SCI IDEA production API URL") }
+require(
+  approvedProductionApiUri.scheme == "https" &&
+    approvedProductionApiUri.host.equals("sci-idea-backend.onrender.com", ignoreCase = true) &&
+    approvedProductionApiUri.userInfo == null &&
+    approvedProductionApiUri.query == null &&
+    approvedProductionApiUri.fragment == null &&
+    (approvedProductionApiUri.path.isNullOrEmpty() || approvedProductionApiUri.path == "/") &&
+    (approvedProductionApiUri.port == -1 || approvedProductionApiUri.port == 443)
+) { "Production API URL must use HTTPS and the approved SCI IDEA backend host" }
 
 plugins {
   alias(libs.plugins.android.application)
@@ -44,15 +61,19 @@ android {
     release {
       isCrunchPngs = false
       isMinifyEnabled = false
+      manifestPlaceholders["usesCleartextTraffic"] = "false"
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       // Do not remove or modify this signingConfig assignment. It is necessary for Android apps in
       // AI Studio.
       signingConfig = signingConfigs.getByName("release")
+      buildConfigField("String", "API_BASE_URL", "\"$approvedProductionApiUrl\"")
     }
     debug {
       // Do not remove or modify this signingConfig assignment. It is necessary for Android apps in
       // AI Studio.
       signingConfig = signingConfigs.getByName("debugConfig")
+      manifestPlaceholders["usesCleartextTraffic"] = "true"
+      buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000/\"")
     }
   }
   compileOptions {
@@ -121,7 +142,6 @@ dependencies {
   implementation(libs.firebase.appcheck.debug)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
-  implementation(libs.logging.interceptor)
   implementation(libs.moshi.kotlin)
   implementation(libs.okhttp)
   // implementation(libs.play.services.location)

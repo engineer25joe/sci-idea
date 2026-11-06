@@ -1,14 +1,12 @@
 package com.example.network
 
 import android.content.Context
-import android.util.Log
 import com.example.data.UserActivityTracker
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
@@ -17,15 +15,10 @@ class DjangoSyncManager(
     private val context: Context,
     private val activityTracker: UserActivityTracker
 ) {
-    private val tag = "DjangoSyncManager"
-
-    private fun buildRetrofit(baseUrl: String): Retrofit {
-        val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
-
+    private fun buildRetrofit(): Retrofit {
         val client = OkHttpClient.Builder()
-            .addInterceptor(logging)
+            .followRedirects(false)
+            .followSslRedirects(false)
             .connectTimeout(5, TimeUnit.SECONDS)
             .readTimeout(5, TimeUnit.SECONDS)
             .build()
@@ -34,19 +27,16 @@ class DjangoSyncManager(
             .add(KotlinJsonAdapterFactory())
             .build()
 
-        val cleanUrl = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"
-
         return Retrofit.Builder()
-            .baseUrl(cleanUrl)
+            .baseUrl(BackendConfig.apiBaseUrl)
             .client(client)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
     }
 
     suspend fun testConnection(): Pair<Boolean, String> = withContext(Dispatchers.IO) {
-        val url = activityTracker.djangoBackendUrl
         try {
-            val service = buildRetrofit(url).create(BiasharaApiService::class.java)
+            val service = buildRetrofit().create(BiasharaApiService::class.java)
             val resp = service.getBusinessIdeas()
             if (resp.isSuccessful) {
                 Pair(true, "Connected to Django successfully! (${resp.body()?.size ?: 0} ideas available)")
@@ -54,7 +44,7 @@ class DjangoSyncManager(
                 Pair(false, "Server responded with HTTP ${resp.code()}")
             }
         } catch (e: Exception) {
-            Pair(false, "Cannot reach Django backend at $url (${e.localizedMessage ?: "Connection refused"}). Offline mode active.")
+            Pair(false, "Cannot reach the configured backend. Offline mode remains available.")
         }
     }
 
@@ -82,7 +72,7 @@ class DjangoSyncManager(
         )
 
         try {
-            val service = buildRetrofit(activityTracker.djangoBackendUrl).create(BiasharaApiService::class.java)
+            val service = buildRetrofit().create(BiasharaApiService::class.java)
             val resp = service.postTrackingEvents(request)
             if (resp.isSuccessful && resp.body()?.status == "success") {
                 val syncedIds = unsynced.map { it.id }.toSet()
@@ -92,14 +82,13 @@ class DjangoSyncManager(
                 Pair(0, "Sync deferred: HTTP ${resp.code()}")
             }
         } catch (e: Exception) {
-            Log.w(tag, "Django tracking sync deferred: ${e.message}")
             Pair(0, "Offline: Events queued locally on device.")
         }
     }
 
     suspend fun fetchRemoteIdeas(): List<RemoteIdeaDto> = withContext(Dispatchers.IO) {
         try {
-            val service = buildRetrofit(activityTracker.djangoBackendUrl).create(BiasharaApiService::class.java)
+            val service = buildRetrofit().create(BiasharaApiService::class.java)
             val resp = service.getBusinessIdeas()
             if (resp.isSuccessful) {
                 resp.body() ?: emptyList()

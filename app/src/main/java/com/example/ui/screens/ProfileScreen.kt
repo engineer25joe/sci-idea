@@ -42,6 +42,7 @@ fun ProfileScreen(
     var showActivityDialog by remember { mutableStateOf(false) }
     var showSettingsDialog by remember { mutableStateOf(false) }
     var showHelpDialog by remember { mutableStateOf(false) }
+    var showAccountDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -118,6 +119,29 @@ fun ProfileScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 20.dp)
         ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showAccountDialog = true }
+                    .testTag("profile_cloud_account_card"),
+                shape = RoundedCornerShape(14.dp),
+                color = Color.White,
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE5E7EB)),
+                shadowElevation = 1.dp,
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("SCI IDEA account", fontWeight = FontWeight.Bold, color = KenyanGreen)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        "Sign in or create an account for personalized cloud services. Offline tools remain available.",
+                        fontSize = 12.sp,
+                        color = Color(0xFF6B7280),
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
             // Card: "My Journey" (3/10 ideas explored)
             Surface(
                 modifier = Modifier
@@ -394,7 +418,6 @@ fun ProfileScreen(
     // Settings & Django Backend Config Dialog
     // -------------------------------------------------------------
     if (showSettingsDialog) {
-        var urlInput by remember { mutableStateOf(uiState.djangoBackendUrl) }
         var nameInput by remember { mutableStateOf(uiState.userProfileName) }
         var emailInput by remember { mutableStateOf(uiState.userProfileEmail) }
 
@@ -409,21 +432,19 @@ fun ProfileScreen(
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
                 ) {
-                    Text("Remote Management Backend URL:", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Configured Remote Backend:", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.height(4.dp))
-                    OutlinedTextField(
-                        value = urlInput,
-                        onValueChange = { urlInput = it },
-                        modifier = Modifier.fillMaxWidth().testTag("settings_django_url_input"),
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = KenyanGreen)
+                    Text(
+                        text = uiState.djangoBackendUrl,
+                        modifier = Modifier.fillMaxWidth().testTag("settings_django_url_value"),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 13.sp,
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Button(
                         onClick = {
-                            viewModel.updateDjangoBackendUrl(urlInput)
                             viewModel.testDjangoConnection()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = KenyanGreen),
@@ -468,7 +489,6 @@ fun ProfileScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.updateDjangoBackendUrl(urlInput)
                         viewModel.saveUserProfile(nameInput, emailInput)
                         showSettingsDialog = false
                     },
@@ -525,6 +545,10 @@ fun ProfileScreen(
                 }
             }
         )
+    }
+
+    if (showAccountDialog) {
+        AccountAuthDialog(onDismiss = { showAccountDialog = false })
     }
 }
 

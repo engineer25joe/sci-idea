@@ -15,6 +15,7 @@ import java.util.UUID
 
 import com.example.data.UserActivityTracker
 import com.example.network.DjangoSyncManager
+import com.example.network.BackendConfig
 
 enum class DiscoveryMode {
     QUICK,
@@ -59,7 +60,7 @@ data class BiasharaUiState(
     // User Activity Tracking & Django State
     val userActivities: List<UserActivityEvent> = emptyList(),
     val isSyncingToDjango: Boolean = false,
-    val djangoBackendUrl: String = "http://10.0.2.2:8000",
+    val djangoBackendUrl: String = BackendConfig.apiBaseUrl,
     val djangoConnectionStatus: String = "Offline Mode (Local Storage)",
 
     // Journey & Plans
@@ -329,11 +330,6 @@ class BiasharaViewModel(application: Application) : AndroidViewModel(application
                 )
             }
         }
-    }
-
-    fun updateDjangoBackendUrl(url: String) {
-        activityTracker.djangoBackendUrl = url
-        _uiState.update { it.copy(djangoBackendUrl = url) }
     }
 
     fun saveUserProfile(name: String, email: String) {

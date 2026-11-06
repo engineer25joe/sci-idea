@@ -1,5 +1,7 @@
+import hashlib
 import os
 from pathlib import Path
+from datetime import timedelta
 
 import dj_database_url
 from dotenv import load_dotenv
@@ -19,7 +21,7 @@ load_dotenv(BASE_DIR / ".env")
 # SECURITY CONFIGURATION
 # --------------------------------------------------
 
-DEBUG = os.getenv("DEBUG", "True").lower() == "true"
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
@@ -63,6 +65,9 @@ INSTALLED_APPS = [
     "rest_framework",
 
     "api",
+    "accounts",
+    "research",
+    "rest_framework_simplejwt.token_blacklist",
 ]
 
 
@@ -254,8 +259,11 @@ X_FRAME_OPTIONS = "DENY"
 # --------------------------------------------------
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
+        "accounts.permissions.IsVerifiedAccount",
     ],
 
     "DEFAULT_PAGINATION_CLASS": (
@@ -263,4 +271,46 @@ REST_FRAMEWORK = {
     ),
 
     "PAGE_SIZE": 50,
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/minute",
+        "user": "120/hour",
+    },
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "CHECK_USER_IS_ACTIVE": True,
+    "UPDATE_LAST_LOGIN": False,
+    # Derive a full-length signing key without ever logging it. A dedicated
+    # JWT_SIGNING_KEY may be supplied independently in production.
+    "SIGNING_KEY": hashlib.sha256(
+        os.getenv("JWT_SIGNING_KEY", SECRET_KEY).encode("utf-8")
+    ).hexdigest(),
+}
+
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 12}},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.locmem.EmailBackend"
+    if DEBUG
+    else "django.core.mail.backends.smtp.EmailBackend",
+)
+EMAIL_HOST = os.getenv("EMAIL_HOST", "")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() == "true"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "SCI IDEA <no-reply@sci-idea.local>")
+
+# Bound API bodies before DRF parses JSON. Research has a stricter endpoint cap.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 262_144

@@ -3,6 +3,7 @@ package com.example
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.example.data.HustleRepository
+import com.example.data.UserActivityTracker
 import com.example.domain.RecommendationEngine
 import com.example.domain.UserProfileQuery
 import com.example.model.*
@@ -131,6 +132,16 @@ class ExampleRobolectricTest {
             assertEquals(DownloadStatus.DOWNLOADED, target!!.downloadStatus)
             assertNotNull(target.localFilePath)
         }
+    }
+
+    @Test
+    fun `activity events remain locally queued without network access`() {
+        val tracker = UserActivityTracker(context)
+        val event = tracker.logEvent(ActivityType.SEARCH, targetTitle = "offline test")
+
+        val saved = tracker.getAllEvents().first { it.id == event.id }
+        assertFalse(saved.isSyncedToDjango)
+        assertEquals("offline test", saved.targetTitle)
     }
 
     @Test

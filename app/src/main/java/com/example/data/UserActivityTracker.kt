@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.model.ActivityType
 import com.example.model.UserActivityEvent
+import com.example.network.BackendConfig
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.UUID
@@ -16,8 +17,6 @@ class UserActivityTracker(context: Context) {
     companion object {
         private const val KEY_EVENTS = "tracking_events_json"
         private const val KEY_DEVICE_ID = "tracking_device_id"
-        private const val KEY_DJANGO_URL = "django_backend_url"
-        private const val DEFAULT_DJANGO_URL = "https://sci-idea-backend.onrender.com"
     }
 
     init {
@@ -29,11 +28,8 @@ class UserActivityTracker(context: Context) {
     val deviceId: String
         get() = prefs.getString(KEY_DEVICE_ID, "dev_kenya_user") ?: "dev_kenya_user"
 
-    var djangoBackendUrl: String
-        get() = prefs.getString(KEY_DJANGO_URL, DEFAULT_DJANGO_URL) ?: DEFAULT_DJANGO_URL
-        set(value) {
-            prefs.edit().putString(KEY_DJANGO_URL, value.trim().removeSuffix("/")).apply()
-        }
+    val djangoBackendUrl: String
+        get() = BackendConfig.apiBaseUrl
 
     fun logEvent(
         type: ActivityType,
