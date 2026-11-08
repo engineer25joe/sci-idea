@@ -3,6 +3,8 @@ package com.example.network
 import java.net.URI
 import java.util.Locale
 
+import com.example.BuildConfig
+
 object BackendUrlPolicy {
     const val PRODUCTION_HOST = "sci-idea-backend.onrender.com"
     private val developmentHosts = setOf("10.0.2.2", "localhost", "127.0.0.1", "::1", "[::1]")
