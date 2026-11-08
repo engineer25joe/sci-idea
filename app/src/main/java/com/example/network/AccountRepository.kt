@@ -1,7 +1,5 @@
 package com.example.network
 
-import com.example.network.dto.*
-
 import android.content.Context
 import org.json.JSONObject
 import kotlinx.coroutines.sync.Mutex
