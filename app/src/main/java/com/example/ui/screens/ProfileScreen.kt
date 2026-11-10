@@ -40,7 +40,6 @@ fun ProfileScreen(
     onNavigateToStories: () -> Unit
 ) {
     var showActivityDialog by remember { mutableStateOf(false) }
-    var showSettingsDialog by remember { mutableStateOf(false) }
     var showHelpDialog by remember { mutableStateOf(false) }
     var showAccountDialog by remember { mutableStateOf(false) }
 
@@ -57,22 +56,7 @@ fun ProfileScreen(
                 .fillMaxWidth()
                 .background(KenyanGreen)
                 .padding(top = 40.dp, bottom = 28.dp)
-        ) {
-            // Settings gear on top right
-            IconButton(
-                onClick = { showSettingsDialog = true },
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(end = 16.dp)
-                    .testTag("profile_top_settings_gear")
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Settings,
-                    contentDescription = "Settings",
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+        )
 
             // Avatar and Profile Info
             Column(
@@ -212,15 +196,6 @@ fun ProfileScreen(
                 badgeText = "${uiState.userActivities.size} events",
                 testTag = "profile_menu_activity",
                 onClick = { showActivityDialog = true }
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            ProfileMenuItem(
-                icon = Icons.Outlined.Settings,
-                title = "Settings & Django Backend",
-                testTag = "profile_menu_settings",
-                onClick = { showSettingsDialog = true }
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -415,97 +390,6 @@ fun ProfileScreen(
     }
 
     // -------------------------------------------------------------
-    // Settings & Django Backend Config Dialog
-    // -------------------------------------------------------------
-    if (showSettingsDialog) {
-        var nameInput by remember { mutableStateOf(uiState.userProfileName) }
-        var emailInput by remember { mutableStateOf(uiState.userProfileEmail) }
-
-        AlertDialog(
-            onDismissRequest = { showSettingsDialog = false },
-            title = {
-                Text("Settings & Remote Django", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            },
-            text = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Text("Configured Remote Backend:", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = uiState.djangoBackendUrl,
-                        modifier = Modifier.fillMaxWidth().testTag("settings_django_url_value"),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 13.sp,
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Button(
-                        onClick = {
-                            viewModel.testDjangoConnection()
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = KenyanGreen),
-                        modifier = Modifier.fillMaxWidth().testTag("settings_test_connection_button")
-                    ) {
-                        Text("Test Connection")
-                    }
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    Text("User Profile Info:", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    OutlinedTextField(
-                        value = nameInput,
-                        onValueChange = { nameInput = it },
-                        label = { Text("Name") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    OutlinedTextField(
-                        value = emailInput,
-                        onValueChange = { emailInput = it },
-                        label = { Text("Email") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    OutlinedButton(
-                        onClick = {
-                            viewModel.resetOnboarding()
-                            showSettingsDialog = false
-                        },
-                        modifier = Modifier.fillMaxWidth().testTag("settings_restart_wizard_button")
-                    ) {
-                        Text("Restart Onboarding Wizard")
-                    }
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        viewModel.saveUserProfile(nameInput, emailInput)
-                        showSettingsDialog = false
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = KenyanGreen)
-                ) {
-                    Text("Save")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showSettingsDialog = false }) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
-
-    // -------------------------------------------------------------
     // Help & Support Dialog
     // -------------------------------------------------------------
     if (showHelpDialog) {
@@ -522,10 +406,10 @@ fun ProfileScreen(
                         color = Color(0xFF4B5563)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    Text("Official Youth Support Hotlines:", fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                    Text("• Youth Enterprise Development Fund (YEDF): 0800 724 933", fontSize = 12.sp)
-                    Text("• Uwezo Fund Kenya: *254# / uwezo.go.ke", fontSize = 12.sp)
-                    Text("• Hustler Fund USSD: Dial *254#", fontSize = 12.sp)
+                    Text("Official Developers Hotlines:", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Text("• SCI BASE COLLECTIONS: +254723 534 054", fontSize = 12.sp)
+                    Text("• ENGINEER JOE: +254723 534 054", fontSize = 12.sp)
+                    Text("• Text us on WhatsApp via : @engineer25joe  or  @SciBaseCollections ", fontSize = 12.sp)
                     Spacer(modifier = Modifier.height(12.dp))
                     Button(
                         onClick = {
@@ -535,7 +419,7 @@ fun ProfileScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = KenyanGreen),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("View Success Stories & Mentors")
+                        Text("Close & Explore Stories", color = Color.White)
                     }
                 }
             },

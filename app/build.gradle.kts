@@ -72,8 +72,8 @@ android {
       // Do not remove or modify this signingConfig assignment. It is necessary for Android apps in
       // AI Studio.
       signingConfig = signingConfigs.getByName("debugConfig")
-      manifestPlaceholders["usesCleartextTraffic"] = "true"
-      buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000/\"")
+      manifestPlaceholders["usesCleartextTraffic"] = "false"
+      buildConfigField("String", "API_BASE_URL", "\"$approvedProductionApiUrl\"")
     }
   }
   compileOptions {

@@ -5,31 +5,60 @@ import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class BackendUrlPolicyTest {
+
     @Test
-    fun `production accepts only the approved https host`() {
+    fun `accepts only approved production backend`() {
         assertEquals(
             "https://sci-idea-backend.onrender.com/",
-            BackendUrlPolicy.validate("https://sci-idea-backend.onrender.com", isDebug = false)
+            BackendUrlPolicy.validate(
+                "https://sci-idea-backend.onrender.com"
+            )
         )
+
+        assertEquals(
+            "https://sci-idea-backend.onrender.com/",
+            BackendUrlPolicy.validate(
+                "https://sci-idea-backend.onrender.com/"
+            )
+        )
+    }
+
+    @Test
+    fun `rejects http connections`() {
         assertThrows(IllegalArgumentException::class.java) {
-            BackendUrlPolicy.validate("http://sci-idea-backend.onrender.com", isDebug = false)
-        }
-        assertThrows(IllegalArgumentException::class.java) {
-            BackendUrlPolicy.validate("https://attacker.example", isDebug = false)
+            BackendUrlPolicy.validate(
+                "http://sci-idea-backend.onrender.com"
+            )
         }
     }
 
     @Test
-    fun `development accepts local hosts but rejects arbitrary hosts and credentials`() {
-        assertEquals(
-            "http://10.0.2.2:8000/",
-            BackendUrlPolicy.validate("http://10.0.2.2:8000", isDebug = true)
-        )
+    fun `rejects unapproved hosts`() {
         assertThrows(IllegalArgumentException::class.java) {
-            BackendUrlPolicy.validate("http://attacker.example", isDebug = true)
+            BackendUrlPolicy.validate(
+                "https://attacker.example"
+            )
         }
+
         assertThrows(IllegalArgumentException::class.java) {
-            BackendUrlPolicy.validate("https://user:pass@localhost:8000", isDebug = true)
+            BackendUrlPolicy.validate(
+                "http://10.0.2.2:8000"
+            )
+        }
+    }
+
+    @Test
+    fun `rejects credentials and query parameters`() {
+        assertThrows(IllegalArgumentException::class.java) {
+            BackendUrlPolicy.validate(
+                "https://user:pass@sci-idea-backend.onrender.com"
+            )
+        }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            BackendUrlPolicy.validate(
+                "https://sci-idea-backend.onrender.com?debug=true"
+            )
         }
     }
 }
