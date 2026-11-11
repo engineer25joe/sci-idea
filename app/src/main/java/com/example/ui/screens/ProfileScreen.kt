@@ -257,7 +257,7 @@ fun ProfileScreen(
                 }
             }
         }
-    }
+
 
     // -------------------------------------------------------------
     // My Activity & Tracking Dialog (Telemetry Viewer & Django Sync)
