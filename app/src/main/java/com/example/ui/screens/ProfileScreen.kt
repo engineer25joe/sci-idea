@@ -31,17 +31,19 @@ import com.example.viewmodel.BiasharaViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.example.network.AccountProfileDto
 
 @Composable
 fun ProfileScreen(
     uiState: BiasharaUiState,
     viewModel: BiasharaViewModel,
+    accountProfile: AccountProfileDto,
+    onLogout: () -> Unit,
     onNavigateToSaved: () -> Unit,
     onNavigateToStories: () -> Unit
-) {
+){
     var showActivityDialog by remember { mutableStateOf(false) }
     var showHelpDialog by remember { mutableStateOf(false) }
-    var showAccountDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -103,37 +105,99 @@ fun ProfileScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 20.dp)
         ) {
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Authenticated SCI IDEA Account
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { showAccountDialog = true }
                     .testTag("profile_cloud_account_card"),
                 shape = RoundedCornerShape(14.dp),
                 color = Color.White,
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE5E7EB)),
-                shadowElevation = 1.dp,
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    Color(0xFFE5E7EB)
+                ),
+                shadowElevation = 1.dp
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("SCI IDEA account", fontWeight = FontWeight.Bold, color = KenyanGreen)
-                    Spacer(modifier = Modifier.height(4.dp))
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
                     Text(
-                        "Sign in or create an account for personalized cloud services. Offline tools remain available.",
-                        fontSize = 12.sp,
-                        color = Color(0xFF6B7280),
+                        text = "SCI IDEA account",
+                        fontWeight = FontWeight.Bold,
+                        color = KenyanGreen
                     )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = listOf(
+                            accountProfile.firstName,
+                            accountProfile.lastName
+                        ).filter { it.isNotBlank() }
+                            .joinToString(" ")
+                            .ifBlank { "SCI IDEA User" },
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 15.sp,
+                        color = Color(0xFF111827)
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = accountProfile.email,
+                        fontSize = 12.sp,
+                        color = Color(0xFF6B7280)
+                    )
+
+                    accountProfile.phoneNumber?.let { phone ->
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = phone,
+                            fontSize = 12.sp,
+                            color = Color(0xFF6B7280)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Verified,
+                            contentDescription = "Verified account",
+                            tint = KenyanGreen,
+                            modifier = Modifier.size(16.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(6.dp))
+
+                        Text(
+                            text = "Email verified",
+                            fontSize = 12.sp,
+                            color = KenyanGreen
+                        )
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Card: "My Journey" (3/10 ideas explored)
+            // Card: My Journey
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("profile_journey_card"),
                 shape = RoundedCornerShape(14.dp),
                 color = Color.White,
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE5E7EB)),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    Color(0xFFE5E7EB)
+                ),
                 shadowElevation = 1.dp
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -148,6 +212,7 @@ fun ProfileScreen(
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF111827)
                         )
+
                         Text(
                             text = "3 / 10",
                             fontSize = 13.sp,
@@ -179,7 +244,6 @@ fun ProfileScreen(
             }
 
             Spacer(modifier = Modifier.height(18.dp))
-
             // Menu Items List
             ProfileMenuItem(
                 icon = Icons.Outlined.BookmarkBorder,
@@ -211,9 +275,7 @@ fun ProfileScreen(
 
             // Log Out Button
             OutlinedButton(
-                onClick = {
-                    viewModel.resetOnboarding()
-                },
+                onClick = onLogout,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
@@ -429,10 +491,6 @@ fun ProfileScreen(
                 }
             }
         )
-    }
-
-    if (showAccountDialog) {
-        AccountAuthDialog(onDismiss = { showAccountDialog = false })
     }
 }
 
