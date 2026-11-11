@@ -8,6 +8,16 @@ class AccountProfile(models.Model):
         on_delete=models.CASCADE,
         related_name="account_profile",
     )
+
+    # Nullable for compatibility with accounts created before phone registration.
+    phone_number = models.CharField(
+        max_length=16,
+        unique=True,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+
     email_verified = models.BooleanField(default=False, db_index=True)
     suspended_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -28,6 +38,7 @@ class AccountProfile(models.Model):
 class AccountActionToken(models.Model):
     EMAIL_VERIFICATION = "EMAIL_VERIFICATION"
     PASSWORD_RESET = "PASSWORD_RESET"
+
     PURPOSE_CHOICES = [
         (EMAIL_VERIFICATION, "Email verification"),
         (PASSWORD_RESET, "Password reset"),
@@ -45,7 +56,9 @@ class AccountActionToken(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        indexes = [models.Index(fields=["user", "purpose", "created_at"])]
+        indexes = [
+            models.Index(fields=["user", "purpose", "created_at"])
+        ]
 
     def __str__(self):
         return f"{self.purpose} token for user {self.user_id}"

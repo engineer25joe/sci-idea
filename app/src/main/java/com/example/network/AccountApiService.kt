@@ -12,6 +12,7 @@ import retrofit2.http.POST
 @JsonClass(generateAdapter = true)
 data class RegisterAccountRequest(
     val email: String,
+    @Json(name = "phone_number") val phoneNumber: String,
     val password: String,
     @Json(name = "password_confirm") val passwordConfirm: String,
     @Json(name = "first_name") val firstName: String,
@@ -25,7 +26,10 @@ data class EmailRequest(val email: String)
 data class CodeRequest(val token: String)
 
 @JsonClass(generateAdapter = true)
-data class LoginRequest(val email: String, val password: String)
+data class LoginRequest(
+    val identifier: String,
+    val password: String,
+)
 
 @JsonClass(generateAdapter = true)
 data class PasswordResetRequest(val email: String)
@@ -56,6 +60,7 @@ data class AccountProfileDto(
     @Json(name = "first_name") val firstName: String = "",
     @Json(name = "last_name") val lastName: String = "",
     @Json(name = "created_at") val createdAt: String? = null,
+    @Json(name = "phone_number") val phoneNumber: String? = null,
 )
 
 @JsonClass(generateAdapter = true)
@@ -66,7 +71,10 @@ data class LoginResponse(
 )
 
 @JsonClass(generateAdapter = true)
-data class RefreshResponse(val access: String, val refresh: String)
+data class RefreshResponse(
+    val access: String,
+    val refresh: String,
+)
 
 @JsonClass(generateAdapter = true)
 data class AccountMessage(
@@ -76,20 +84,31 @@ data class AccountMessage(
 )
 
 interface AccountApiService {
+
     @POST("api/v1/auth/register/")
-    suspend fun register(@Body request: RegisterAccountRequest): Response<AccountMessage>
+    suspend fun register(
+        @Body request: RegisterAccountRequest,
+    ): Response<AccountMessage>
 
     @POST("api/v1/auth/verify-email/")
-    suspend fun verifyEmail(@Body request: CodeRequest): Response<AccountMessage>
+    suspend fun verifyEmail(
+        @Body request: CodeRequest,
+    ): Response<AccountMessage>
 
     @POST("api/v1/auth/verify-email/resend/")
-    suspend fun resendVerification(@Body request: EmailRequest): Response<AccountMessage>
+    suspend fun resendVerification(
+        @Body request: EmailRequest,
+    ): Response<AccountMessage>
 
     @POST("api/v1/auth/login/")
-    suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
+    suspend fun login(
+        @Body request: LoginRequest,
+    ): Response<LoginResponse>
 
     @POST("api/v1/auth/token/refresh/")
-    suspend fun refresh(@Body request: RefreshRequest): Response<RefreshResponse>
+    suspend fun refresh(
+        @Body request: RefreshRequest,
+    ): Response<RefreshResponse>
 
     @POST("api/v1/auth/logout/")
     suspend fun logout(
@@ -98,13 +117,19 @@ interface AccountApiService {
     ): Response<Unit>
 
     @POST("api/v1/auth/password-reset/")
-    suspend fun requestPasswordReset(@Body request: PasswordResetRequest): Response<AccountMessage>
+    suspend fun requestPasswordReset(
+        @Body request: PasswordResetRequest,
+    ): Response<AccountMessage>
 
     @POST("api/v1/auth/password-reset/confirm/")
-    suspend fun confirmPasswordReset(@Body request: PasswordResetConfirmRequest): Response<AccountMessage>
+    suspend fun confirmPasswordReset(
+        @Body request: PasswordResetConfirmRequest,
+    ): Response<AccountMessage>
 
     @GET("api/v1/auth/profile/")
-    suspend fun getProfile(@Header("Authorization") authorization: String): Response<AccountProfileDto>
+    suspend fun getProfile(
+        @Header("Authorization") authorization: String,
+    ): Response<AccountProfileDto>
 
     @PATCH("api/v1/auth/profile/")
     suspend fun updateProfile(

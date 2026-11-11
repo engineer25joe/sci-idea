@@ -1,6 +1,9 @@
 import re
 from django.contrib.auth import get_user_model
+
 from django.core import mail
+from django.core.cache import cache
+
 from django.test import TestCase, override_settings
 from django.utils import timezone
 from rest_framework.test import APIClient
@@ -16,14 +19,26 @@ PASSWORD = "Sufficiently-Strong-Password-2026!"
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class AccountSecurityTests(TestCase):
     def setUp(self):
+        cache.clear()
         self.client = APIClient()
         mail.outbox.clear()
 
-    def create_account(self, email="person@example.com", verified=True):
+    def create_account(
+        self,
+        email="person@example.com",
+        verified=True,
+        phone_number="+254712345678",
+    ):
         user = User.objects.create_user(
-            username=email.lower(), email=email.lower(), password=PASSWORD
+            username=email.lower(),
+            email=email.lower(),
+            password=PASSWORD,
         )
-        AccountProfile.objects.create(user=user, email_verified=verified)
+        AccountProfile.objects.create(
+            user=user,
+            email_verified=verified,
+            phone_number=phone_number,
+        )
         return user
 
     def authenticate(self, user):
@@ -39,6 +54,8 @@ class AccountSecurityTests(TestCase):
                 "password": PASSWORD,
                 "password_confirm": PASSWORD,
                 "first_name": "New",
+                "phone_number": "0712345678",
+                "last_name": "Person",
             },
             format="json",
         )
@@ -65,7 +82,10 @@ class AccountSecurityTests(TestCase):
         user = self.create_account(verified=False)
         login = self.client.post(
             "/api/v1/auth/login/",
-            {"email": user.email, "password": PASSWORD},
+            {
+                "identifier": user.email,
+                "password": PASSWORD,
+            },
             format="json",
         )
         self.assertEqual(login.status_code, 403)
@@ -173,3 +193,38 @@ class AccountSecurityTests(TestCase):
         user.save(update_fields=["is_active"])
         response = self.client.get("/api/v1/auth/profile/")
         self.assertEqual(response.status_code, 401)
+
+    def test_login_with_phone_number(self):
+        user = self.create_account()
+
+        response = self.client.post(
+            "/api/v1/auth/login/",
+            {
+                "identifier": "0712345678",
+                "password": PASSWORD,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("access", response.data)
+        self.assertIn("refresh", response.data)
+        self.assertEqual(response.data["profile"]["phone_number"], "+254712345678")
+
+
+    def test_duplicate_phone_number_is_rejected(self):
+        self.create_account()
+
+        response = self.client.post(
+            "/api/v1/auth/register/",
+            {
+                "email": "another@example.com",
+                "phone_number": "0712345678",
+                "password": PASSWORD,
+                "password_confirm": PASSWORD,
+                "first_name": "Another",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
