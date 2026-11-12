@@ -200,6 +200,13 @@ class LoginView(LimitedRequestAPIView):
 
         profile, _ = AccountProfile.objects.get_or_create(user=user)
 
+        # Django superusers are trusted administrative accounts.
+        # Automatically verify their profile without weakening
+        # email verification for ordinary users.
+        if user.is_superuser and not profile.email_verified:
+            profile.email_verified = True
+            profile.save(update_fields=["email_verified", "updated_at"])
+
         if not profile.email_verified:
             return Response(
                 {

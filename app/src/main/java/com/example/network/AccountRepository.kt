@@ -12,6 +12,7 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 import com.example.security.SecureTokenStore
 import com.squareup.moshi.Moshi
+import org.json.JSONArray
 
 class AccountApiException(
     val httpStatus: Int?,
@@ -345,6 +346,41 @@ class AccountRepository(
             JSONObject(response.errorBody()?.string().orEmpty())
         }.getOrNull()
 
+        // Extract Django REST Framework field validation errors.
+        val validationMessages = errorJson?.let { json ->
+            val messages = mutableListOf<String>()
+            val keys = json.keys()
+
+            while (keys.hasNext()) {
+                val key = keys.next()
+                val value = json.opt(key)
+
+                when (value) {
+                    is JSONArray -> {
+                        for (index in 0 until value.length()) {
+                            val item = value.optString(index)
+                            if (item.isNotBlank()) {
+                                messages.add("$key: $item")
+                            }
+                        }
+                    }
+
+                    is JSONObject -> {
+                        messages.add("$key: $value")
+                    }
+
+                    else -> {
+                        if (value != null && value.toString().isNotBlank()) {
+                            messages.add(value.toString())
+                        }
+                    }
+                }
+            }
+
+            messages.joinToString("\n")
+                .takeIf { it.isNotBlank() }
+        }
+
         val message = when (response.code()) {
 
             401 ->
@@ -354,7 +390,9 @@ class AccountRepository(
                 if (errorJson?.optString("code") == "EMAIL_UNVERIFIED") {
                     "Verify your email before signing in."
                 } else {
-                    "This account cannot access the requested service."
+                    errorJson?.optString("error")
+                        ?.takeIf { it.isNotBlank() }
+                        ?: "This account cannot access the requested service."
                 }
 
             413 ->
@@ -367,13 +405,16 @@ class AccountRepository(
                 "The backend redirected this request, so it was stopped."
 
             in 500..599 ->
-                "The account service is temporarily unavailable. Try again later."
+                errorJson?.optString("error")
+                    ?.takeIf { it.isNotBlank() }
+                    ?: "The account service is temporarily unavailable. Try again later."
 
             else ->
                 errorJson?.optString("error")
                     ?.takeIf { it.isNotBlank() }
                     ?: errorJson?.optString("detail")
                         ?.takeIf { it.isNotBlank() }
+                    ?: validationMessages
                     ?: "Check the submitted information and try again."
         }
 
@@ -382,6 +423,8 @@ class AccountRepository(
             message,
         )
     }
+
+
 
     companion object {
 
