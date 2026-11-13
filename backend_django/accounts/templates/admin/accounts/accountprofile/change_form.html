@@ -1,0 +1,23 @@
+{% extends "admin/change_form.html" %}
+
+{% block object-tools-items %}
+
+    {% if original and not original.email_verified %}
+        <li>
+            <form method="post" action="{{ manual_verify_url }}">
+                {% csrf_token %}
+                <button
+                    type="submit"
+                    class="button"
+                    style="background:#198754;color:white;border:0;padding:8px 14px;cursor:pointer;"
+                    onclick="return confirm('Manually verify this account?');"
+                >
+                    Verify Email
+                </button>
+            </form>
+        </li>
+    {% endif %}
+
+    {{ block.super }}
+
+{% endblock %}
