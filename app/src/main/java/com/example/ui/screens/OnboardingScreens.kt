@@ -32,7 +32,7 @@ fun OnboardingFlow(
     onFinishOnboarding: (name: String, email: String, selectedSkills: Set<String>, capital: Int?) -> Unit
 ) {
     // Stage: 0 = Splash Screen, 1 = Onboarding 1 (Skills), 2 = Onboarding 2 (Capital), 3 = Onboarding 3 (Guidance)
-    var currentStep by remember { mutableStateOf(0) }
+    var currentStep by remember { mutableStateOf(1) }
     var selectedSkillIds by remember { mutableStateOf(setOf("horticulture", "cooking_baking", "graphic_design")) }
     var selectedCapitalKes by remember { mutableStateOf<Int?>(25000) }
     var userName by remember { mutableStateOf("John Doe") }
@@ -229,6 +229,7 @@ fun SplashScreen(
 // -------------------------------------------------------------
 // Screen 2: Onboarding 1 - Skills & Interests
 // -------------------------------------------------------------
+
 @Composable
 fun OnboardingStepOne(
     availableSkills: List<Skill>,
@@ -237,101 +238,158 @@ fun OnboardingStepOne(
     onSkip: () -> Unit,
     onNext: () -> Unit
 ) {
+    var searchQuery by remember { mutableStateOf("") }
+
+    val filteredSkills = availableSkills.filter {
+        it.name.contains(searchQuery, ignoreCase = true) ||
+        it.description.contains(searchQuery, ignoreCase = true) ||
+        it.category.displayName.contains(searchQuery, ignoreCase = true)
+    }
+
+    val groupedSkills = filteredSkills
+        .groupBy { it.category }
+        .toList()
+        .sortedBy { it.first.displayName }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(horizontal = 24.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp)
     ) {
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Female Kenyan entrepreneur illustration with floating idea bubbles
-        OnboardingAvatarIllustration(step = 1)
-
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.height(35.dp))
 
         Text(
-            text = "Find Business\nIdeas That Fit You",
-            fontSize = 24.sp,
+            text = "Discover Your Talents!",
+            fontSize = 27.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF111827),
-            textAlign = TextAlign.Center,
-            lineHeight = 30.sp
+            color = Color(0xFF111827)
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(Modifier.height(8.dp))
 
         Text(
-            text = "Discover business opportunities based on your skills, interests and available capital.",
+            text = "Explore your abilities and discover skills that can help you build a successful business.",
             fontSize = 14.sp,
             color = Color(0xFF6B7280),
-            textAlign = TextAlign.Center,
-            lineHeight = 20.sp
+            lineHeight = 21.sp
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(22.dp))
 
-        // Interactive Skill Selector
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = { Text("Search skills...") },
+            leadingIcon = {
+                Icon(Icons.Default.Search, contentDescription = "Search")
+            },
+            singleLine = true,
+            shape = RoundedCornerShape(14.dp)
+        )
+
+        Spacer(Modifier.height(22.dp))
+
         Text(
-            text = "Tap skills you have or want to learn:",
-            fontSize = 13.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = KenyanGreen
+            text = "Explore Categories",
+            fontSize = 19.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF111827)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(Modifier.height(12.dp))
 
-        // Quick Skills Flow Row
-        val displaySkills = if (availableSkills.isNotEmpty()) availableSkills.take(8) else listOf(
-            Skill("horticulture", "Urban Farming", com.example.model.SkillCategory.AGRIBUSINESS),
-            Skill("cooking_baking", "Food & Bakery", com.example.model.SkillCategory.FOOD_HOSPITALITY),
-            Skill("graphic_design", "Graphic Design", com.example.model.SkillCategory.DIGITAL_TECH),
-            Skill("social_media", "Social Media", com.example.model.SkillCategory.DIGITAL_TECH),
-            Skill("phone_repair", "Phone Repair", com.example.model.SkillCategory.DIGITAL_TECH),
-            Skill("carpentry", "Carpentry", com.example.model.SkillCategory.VOCATIONAL_TRADES),
-            Skill("tailoring", "Tailoring", com.example.model.SkillCategory.VOCATIONAL_TRADES),
-            Skill("detergent_making", "Liquid Soap", com.example.model.SkillCategory.RETAIL_COMMERCE)
-        )
+        if (availableSkills.isEmpty()) {
+            Text(
+                text = "Skills are currently unavailable. Please check your internet connection and try again.",
+                color = Color.Gray,
+                fontSize = 14.sp
+            )
+        } else if (groupedSkills.isEmpty()) {
+            Text(
+                text = "No matching skills found.",
+                color = Color.Gray,
+                fontSize = 14.sp
+            )
+        } else {
+            groupedSkills.forEach { (category, skills) ->
 
-        Column(modifier = Modifier.fillMaxWidth()) {
-            displaySkills.chunked(2).forEach { rowPair ->
-                Row(
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        .padding(bottom = 14.dp),
+                    shape = RoundedCornerShape(18.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFF8FAFC)
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        Color(0xFFE5E7EB)
+                    )
                 ) {
-                    rowPair.forEach { skill ->
-                        val isSelected = selectedSkillIds.contains(skill.id)
-                        Surface(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clickable { onToggleSkill(skill.id) }
-                                .testTag("onboarding_skill_${skill.id}"),
-                            shape = RoundedCornerShape(20.dp),
-                            color = if (isSelected) KenyanGreen else Color(0xFFF3F4F6),
-                            border = if (isSelected) null else androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE5E7EB))
-                        ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = category.displayName,
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = KenyanGreen
+                        )
+
+                        Spacer(Modifier.height(10.dp))
+
+                        skills.chunked(2).forEach { rowSkills ->
                             Row(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Icon(
-                                    imageVector = if (isSelected) Icons.Default.CheckCircle else Icons.Default.AddCircleOutline,
-                                    contentDescription = null,
-                                    tint = if (isSelected) Color.White else Color(0xFF6B7280),
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = skill.name,
-                                    fontSize = 12.sp,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                    color = if (isSelected) Color.White else Color(0xFF374151),
-                                    maxLines = 1
-                                )
+                                rowSkills.forEach { skill ->
+                                    Column(
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        FilterChip(
+                                            selected = skill.id in selectedSkillIds,
+                                            onClick = {
+                                                onToggleSkill(skill.id)
+                                            },
+                                            label = {
+                                                Text(
+                                                    skill.name,
+                                                    maxLines = 1
+                                                )
+                                            },
+                                            leadingIcon = {
+                                                Icon(
+                                                    imageVector = if (
+                                                        skill.id in selectedSkillIds
+                                                    ) Icons.Default.CheckCircle
+                                                    else Icons.Default.AddCircleOutline,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(18.dp)
+                                                )
+                                            },
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+
+                                        if (skill.description.isNotBlank()) {
+                                            Text(
+                                                text = skill.description,
+                                                fontSize = 11.sp,
+                                                color = Color.Gray,
+                                                modifier = Modifier.padding(
+                                                    horizontal = 6.dp
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+
+                                if (rowSkills.size == 1) {
+                                    Spacer(Modifier.weight(1f))
+                                }
                             }
                         }
                     }
@@ -339,22 +397,27 @@ fun OnboardingStepOne(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Text(
+            text = "${selectedSkillIds.size} skills selected",
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = KenyanGreen
+        )
 
-        // 4 dots indicator (dot 1 active)
+        Spacer(Modifier.height(20.dp))
+
         DotsProgressIndicator(activeIndex = 0)
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.height(20.dp))
 
-        // Bottom row: Skip & Next
         BottomNavigationRow(
             onSkip = onSkip,
             onNext = onNext,
-            nextText = "Next",
+            nextText = "Continue",
             nextTestTag = "onboarding_1_next"
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.height(25.dp))
     }
 }
 

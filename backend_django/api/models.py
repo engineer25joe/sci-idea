@@ -1,4 +1,5 @@
-from django.db import models
+﻿from django.db import models
+from django.conf import settings
 import json
 
 class Category(models.Model):
@@ -102,3 +103,82 @@ class UserActivityLog(models.Model):
         ]
     def __str__(self):
         return f"[{self.event_type}] {self.target_title or self.target_id or 'General'} by {self.device_id}"
+
+class SkillCategory(models.Model):
+    code = models.CharField(max_length=60, unique=True)
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    icon_name = models.CharField(max_length=60, blank=True)
+    image_url = models.URLField(blank=True)
+    display_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['display_order', 'name']
+        verbose_name_plural = 'Skill categories'
+
+    def __str__(self):
+        return self.name
+
+
+class Skill(models.Model):
+    REVIEW_STATUS = [
+        ("PENDING", "Pending Approval"),
+        ("APPROVED", "Approved"),
+        ("REJECTED", "Rejected"),
+    ]
+
+    id = models.CharField(max_length=100, primary_key=True)
+    name = models.CharField(max_length=150)
+    category = models.ForeignKey(
+        SkillCategory,
+        on_delete=models.PROTECT,
+        related_name='skills'
+    )
+    description = models.TextField(blank=True)
+    image_url = models.URLField(blank=True)
+    display_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    review_status = models.CharField(
+        max_length=20,
+        choices=REVIEW_STATUS,
+        default="APPROVED",
+        db_index=True,
+    )
+    submitted_for_review_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+    reviewed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+    auto_publish_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['display_order', 'name']
+
+    def __str__(self):
+        return self.name
+
+
+class UserSkillSelection(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='skill_selection'
+    )
+    skill_ids = models.JSONField(default=list, blank=True)
+    custom_skills = models.JSONField(default=list, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Skills selected by user {self.user_id}"

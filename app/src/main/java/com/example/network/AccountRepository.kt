@@ -23,6 +23,7 @@ class AccountRepository(
     context: Context,
     private val api: AccountApiService = createApi(),
     private val researchApi: ResearchApiService = createResearchApi(),
+    private val skillsApi: SkillsApiService = createSkillsApi(),
     private val tokenStore: SecureTokenStore =
         SecureTokenStore(context.applicationContext),
 ) {
@@ -150,6 +151,35 @@ class AccountRepository(
                 ProfileUpdateRequest(
                     firstName.trim(),
                     lastName.trim(),
+                ),
+            )
+        }
+
+    suspend fun getAvailableSkills(): List<SkillDto> =
+        authorized {
+            skillsApi.getSkills(it)
+        }
+
+    suspend fun getSkillCategories(): List<SkillCategoryDto> =
+        authorized {
+            skillsApi.getCategories(it)
+        }
+
+    suspend fun getMySkillSelection(): UserSkillSelectionDto =
+        authorized {
+            skillsApi.getMySelection(it)
+        }
+
+    suspend fun saveMySkillSelection(
+        skillIds: List<String>,
+        customSkills: List<String>,
+    ): UserSkillSelectionDto =
+        authorized {
+            skillsApi.saveMySelection(
+                it,
+                SaveUserSkillSelectionRequest(
+                    skillIds = skillIds,
+                    customSkills = customSkills,
                 ),
             )
         }
@@ -433,6 +463,14 @@ class AccountRepository(
 
             return retrofit.create(
                 AccountApiService::class.java,
+            )
+        }
+
+        private fun createSkillsApi(): SkillsApiService {
+            val retrofit = createRetrofit()
+
+            return retrofit.create(
+                SkillsApiService::class.java,
             )
         }
 
