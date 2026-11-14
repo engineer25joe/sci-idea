@@ -1,0 +1,48 @@
+name: SCI IDEA - Render Keepalive and Auto Publishing
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sci-idea-render-keepalive
+  cancel-in-progress: false
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate configuration
+        env:
+          RENDER_BASE_URL: ${{ secrets.RENDER_BASE_URL }}
+          PUBLISH_TRIGGER_TOKEN: ${{ secrets.PUBLISH_TRIGGER_TOKEN }}
+        run: |
+          test -n "$RENDER_BASE_URL" || exit 1
+          test -n "$PUBLISH_TRIGGER_TOKEN" || exit 1
+
+      - name: Ping Render and publish due skills
+        env:
+          RENDER_BASE_URL: ${{ secrets.RENDER_BASE_URL }}
+          PUBLISH_TRIGGER_TOKEN: ${{ secrets.PUBLISH_TRIGGER_TOKEN }}
+        run: |
+          curl \
+            --silent \
+            --show-error \
+            --fail-with-body \
+            --request POST \
+            --header "X-Publish-Token: $PUBLISH_TRIGGER_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data '{}' \
+            --connect-timeout 20 \
+            --max-time 180 \
+            --retry 5 \
+            --retry-all-errors \
+            --retry-delay 10 \
+            "${RENDER_BASE_URL%/}/api/v1/internal/publish-due-skills/"
+
+          echo "Render successfully contacted."
