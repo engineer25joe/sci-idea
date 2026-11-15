@@ -218,27 +218,55 @@ class MainActivity : ComponentActivity() {
 
                     AppEntryState.ONBOARDING -> {
 
+                        var isSavingOnboarding by remember {
+                            mutableStateOf(false)
+                        }
+
                         OnboardingFlow(
                             availableSkills = uiState.allSkills,
 
                             onFinishOnboarding = {
-                                    name,
-                                    email,
-                                    selectedSkills,
-                                    capital ->
+                                name,
+                                email,
+                                selectedSkills,
+                                capital ->
 
-                                viewModel.completeOnboarding(
-                                    name = name,
-                                    email = email,
-                                    selectedSkillIds = selectedSkills,
-                                    capitalKes = capital
-                                )
+                                if (!isSavingOnboarding) {
+                                    isSavingOnboarding = true
 
-                                entryState = AppEntryState.MAIN
+                                    coroutineScope.launch {
+                                        try {
+                                            // Save selected skills to the authenticated user's
+                                            // UserSkillSelection record in PostgreSQL.
+                                            accountRepository.saveMySkillSelection(
+                                                skillIds = selectedSkills.toList(),
+                                                customSkills = emptyList()
+                                            )
+
+                                            // Complete the existing local onboarding process.
+                                            viewModel.completeOnboarding(
+                                                name = name,
+                                                email = email,
+                                                selectedSkillIds = selectedSkills,
+                                                capitalKes = capital
+                                            )
+
+                                            entryState = AppEntryState.MAIN
+
+                                        } catch (e: Exception) {
+
+                                            snackbarHostState.showSnackbar(
+                                                "Could not save your selections. Please try again."
+                                            )
+
+                                        } finally {
+                                            isSavingOnboarding = false
+                                        }
+                                    }
+                                }
                             }
                         )
                     }
-
                     AppEntryState.MAIN -> {
 
                         // Defensive protection against an absent profile.

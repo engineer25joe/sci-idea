@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 @Composable
 fun OnboardingFlow(
     availableSkills: List<Skill>,
+    initialSelectedSkillIds: Set<String> = emptySet(),
     onFinishOnboarding: (name: String, email: String, selectedSkills: Set<String>, capital: Int?) -> Unit
 ) {
     // Stage: 0 = Splash Screen, 1 = Onboarding 1 (Skills), 2 = Onboarding 2 (Capital), 3 = Onboarding 3 (Guidance)
