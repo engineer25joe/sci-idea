@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.model.Skill
 import com.example.ui.components.*
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
 fun OnboardingFlow(
@@ -33,10 +35,10 @@ fun OnboardingFlow(
 ) {
     // Stage: 0 = Splash Screen, 1 = Onboarding 1 (Skills), 2 = Onboarding 2 (Capital), 3 = Onboarding 3 (Guidance)
     var currentStep by remember { mutableStateOf(1) }
-    var selectedSkillIds by remember { mutableStateOf(setOf("horticulture", "cooking_baking", "graphic_design")) }
+    var selectedSkillIds by remember { mutableStateOf(emptySet<String>()) }
     var selectedCapitalKes by remember { mutableStateOf<Int?>(25000) }
-    var userName by remember { mutableStateOf("John Doe") }
-    var userEmail by remember { mutableStateOf("john.doe@example.com") }
+    var userName by remember { mutableStateOf("Joe Dev") }
+    var userEmail by remember { mutableStateOf("joe.dev@example.com") }
 
     Box(
         modifier = Modifier
@@ -240,10 +242,10 @@ fun OnboardingStepOne(
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
-    val filteredSkills = availableSkills.filter {
-        it.name.contains(searchQuery, ignoreCase = true) ||
-        it.description.contains(searchQuery, ignoreCase = true) ||
-        it.category.displayName.contains(searchQuery, ignoreCase = true)
+    val filteredSkills = availableSkills.filter { skill ->
+        skill.name.contains(searchQuery, ignoreCase = true) ||
+        skill.description.contains(searchQuery, ignoreCase = true) ||
+        skill.category.displayName.contains(searchQuery, ignoreCase = true)
     }
 
     val groupedSkills = filteredSkills
@@ -257,40 +259,175 @@ fun OnboardingStepOne(
             .background(Color.White)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)
+            .testTag("discover_talents_screen")
     ) {
-        Spacer(Modifier.height(35.dp))
 
+        Spacer(Modifier.height(22.dp))
+
+        // HERO SECTION
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = KenyanGreen
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                KenyanGreen,
+                                Color(0xFF064E3B)
+                            )
+                        )
+                    )
+                    .padding(22.dp)
+            ) {
+                Column {
+
+                    Text(
+                        text = "SCI IDEA",
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Text(
+                        text = "Discover Your Talents!",
+                        color = Color.White,
+                        fontSize = 27.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        lineHeight = 33.sp
+                    )
+
+                    Spacer(Modifier.height(10.dp))
+
+                    Text(
+                        text = "Your skills could be the beginning of your next business opportunity. Tell us what you can do.",
+                        color = Color.White.copy(alpha = 0.92f),
+                        fontSize = 14.sp,
+                        lineHeight = 21.sp
+                    )
+
+                    Spacer(Modifier.height(18.dp))
+
+                    Surface(
+                        color = Color.White.copy(alpha = 0.16f),
+                        shape = RoundedCornerShape(20.dp)
+                    ) {
+                        Text(
+                            text = "STEP 1 OF 3  •  SKILLS DISCOVERY",
+                            color = Color.White,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(
+                                horizontal = 12.dp,
+                                vertical = 8.dp
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        // SECTION TITLE
         Text(
-            text = "Discover Your Talents!",
-            fontSize = 27.sp,
+            text = "What are you good at?",
+            fontSize = 21.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF111827)
         )
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(5.dp))
 
         Text(
-            text = "Explore your abilities and discover skills that can help you build a successful business.",
-            fontSize = 14.sp,
-            color = Color(0xFF6B7280),
-            lineHeight = 21.sp
+            text = "Select the skills you already have or would like to use.",
+            fontSize = 13.sp,
+            color = Color(0xFF6B7280)
         )
 
-        Spacer(Modifier.height(22.dp))
+        Spacer(Modifier.height(16.dp))
 
+        // SEARCH
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Search skills...") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("skill_search_field"),
+            placeholder = {
+                Text("Search skills or categories...")
+            },
             leadingIcon = {
-                Icon(Icons.Default.Search, contentDescription = "Search")
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = "Search skills"
+                )
+            },
+            trailingIcon = {
+                if (searchQuery.isNotEmpty()) {
+                    IconButton(
+                        onClick = { searchQuery = "" }
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Clear search"
+                        )
+                    }
+                }
             },
             singleLine = true,
-            shape = RoundedCornerShape(14.dp)
+            shape = RoundedCornerShape(15.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = KenyanGreen,
+                cursorColor = KenyanGreen
+            )
         )
 
-        Spacer(Modifier.height(22.dp))
+        Spacer(Modifier.height(18.dp))
+
+        // SELECTED SKILLS COUNTER
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = Color(0xFFE8F5E9),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = KenyanGreen
+                )
+
+                Spacer(Modifier.width(10.dp))
+
+                Column {
+                    Text(
+                        text = "${selectedSkillIds.size} skills selected",
+                        fontWeight = FontWeight.Bold,
+                        color = KenyanGreen,
+                        fontSize = 14.sp
+                    )
+
+                    Text(
+                        text = "Your selections help personalize your opportunities.",
+                        color = Color(0xFF4B5563),
+                        fontSize = 11.sp
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
 
         Text(
             text = "Explore Categories",
@@ -299,21 +436,60 @@ fun OnboardingStepOne(
             color = Color(0xFF111827)
         )
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(5.dp))
+
+        Text(
+            text = "Explore skills from the available catalogue.",
+            fontSize = 12.sp,
+            color = Color(0xFF6B7280)
+        )
+
+        Spacer(Modifier.height(14.dp))
 
         if (availableSkills.isEmpty()) {
-            Text(
-                text = "Skills are currently unavailable. Please check your internet connection and try again.",
-                color = Color.Gray,
-                fontSize = 14.sp
-            )
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = Color(0xFFF9FAFB),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(22.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        Icons.Default.CloudOff,
+                        contentDescription = null,
+                        tint = Color.Gray,
+                        modifier = Modifier.size(36.dp)
+                    )
+
+                    Spacer(Modifier.height(10.dp))
+
+                    Text(
+                        text = "Skills are not available yet.",
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = "Connect to the internet and try loading the catalogue again.",
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
         } else if (groupedSkills.isEmpty()) {
+
             Text(
                 text = "No matching skills found.",
                 color = Color.Gray,
                 fontSize = 14.sp
             )
+
         } else {
+
             groupedSkills.forEach { (category, skills) ->
 
                 Card(
@@ -329,66 +505,123 @@ fun OnboardingStepOne(
                         Color(0xFFE5E7EB)
                     )
                 ) {
+
                     Column(
                         modifier = Modifier.padding(16.dp)
                     ) {
-                        Text(
-                            text = category.displayName,
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = KenyanGreen
-                        )
 
-                        Spacer(Modifier.height(10.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = category.displayName,
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = KenyanGreen,
+                                modifier = Modifier.weight(1f)
+                            )
 
-                        skills.chunked(2).forEach { rowSkills ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            Text(
+                                text = "${skills.size} skills",
+                                fontSize = 11.sp,
+                                color = Color.Gray
+                            )
+                        }
+
+                        // Dynamic category overview based on catalogue content
+                        val categoryDescription = skills
+                            .map { it.description.trim() }
+                            .filter { it.isNotBlank() }
+                            .distinct()
+                            .firstOrNull()
+
+                        if (!categoryDescription.isNullOrBlank()) {
+                            Spacer(Modifier.height(6.dp))
+
+                            Text(
+                                text = categoryDescription,
+                                fontSize = 12.sp,
+                                color = Color(0xFF6B7280),
+                                lineHeight = 18.sp,
+                                maxLines = 3,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+
+                        Spacer(Modifier.height(12.dp))
+
+                        skills.forEach { skill ->
+
+                            val selected =
+                                skill.id in selectedSkillIds
+
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                                    .clickable {
+                                        onToggleSkill(skill.id)
+                                    }
+                                    .testTag("skill_item_${skill.id}"),
+                                shape = RoundedCornerShape(13.dp),
+                                color = if (selected) {
+                                    Color(0xFFE8F5E9)
+                                } else {
+                                    Color.White
+                                },
+                                border = androidx.compose.foundation.BorderStroke(
+                                    if (selected) 1.5.dp else 1.dp,
+                                    if (selected) KenyanGreen
+                                    else Color(0xFFE5E7EB)
+                                )
                             ) {
-                                rowSkills.forEach { skill ->
+
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+
+                                    Icon(
+                                        imageVector = if (selected) {
+                                            Icons.Default.CheckCircle
+                                        } else {
+                                            Icons.Default.AddCircleOutline
+                                        },
+                                        contentDescription = null,
+                                        tint = if (selected) {
+                                            KenyanGreen
+                                        } else {
+                                            Color.Gray
+                                        }
+                                    )
+
+                                    Spacer(Modifier.width(11.dp))
+
                                     Column(
                                         modifier = Modifier.weight(1f)
                                     ) {
-                                        FilterChip(
-                                            selected = skill.id in selectedSkillIds,
-                                            onClick = {
-                                                onToggleSkill(skill.id)
-                                            },
-                                            label = {
-                                                Text(
-                                                    skill.name,
-                                                    maxLines = 1
-                                                )
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    imageVector = if (
-                                                        skill.id in selectedSkillIds
-                                                    ) Icons.Default.CheckCircle
-                                                    else Icons.Default.AddCircleOutline,
-                                                    contentDescription = null,
-                                                    modifier = Modifier.size(18.dp)
-                                                )
-                                            },
-                                            modifier = Modifier.fillMaxWidth()
+
+                                        Text(
+                                            text = skill.name,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = Color(0xFF111827)
                                         )
 
                                         if (skill.description.isNotBlank()) {
+                                            Spacer(Modifier.height(3.dp))
+
                                             Text(
                                                 text = skill.description,
                                                 fontSize = 11.sp,
-                                                color = Color.Gray,
-                                                modifier = Modifier.padding(
-                                                    horizontal = 6.dp
-                                                )
+                                                color = Color(0xFF6B7280),
+                                                lineHeight = 16.sp,
+                                                maxLines = 3,
+                                                overflow = TextOverflow.Ellipsis
                                             )
                                         }
                                     }
-                                }
-
-                                if (rowSkills.size == 1) {
-                                    Spacer(Modifier.weight(1f))
                                 }
                             }
                         }
@@ -397,23 +630,16 @@ fun OnboardingStepOne(
             }
         }
 
-        Text(
-            text = "${selectedSkillIds.size} skills selected",
-            fontSize = 13.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = KenyanGreen
-        )
-
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(12.dp))
 
         DotsProgressIndicator(activeIndex = 0)
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(18.dp))
 
         BottomNavigationRow(
             onSkip = onSkip,
             onNext = onNext,
-            nextText = "Continue",
+            nextText = "Explore Opportunities",
             nextTestTag = "onboarding_1_next"
         )
 
