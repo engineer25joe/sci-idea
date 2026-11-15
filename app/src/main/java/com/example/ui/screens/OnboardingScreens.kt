@@ -32,15 +32,33 @@ import androidx.compose.ui.text.style.TextOverflow
 fun OnboardingFlow(
     availableSkills: List<Skill>,
     initialSelectedSkillIds: Set<String> = emptySet(),
-    onFinishOnboarding: (name: String, email: String, selectedSkills: Set<String>, capital: Int?) -> Unit
+    onFinishOnboarding: (
+        name: String,
+        email: String,
+        selectedSkills: Set<String>,
+        capital: Int?
+    ) -> Unit
 ) {
-    // Stage: 0 = Splash Screen, 1 = Onboarding 1 (Skills), 2 = Onboarding 2 (Capital), 3 = Onboarding 3 (Guidance)
+    // Stage: 1 = Skills, 2 = Capital, 3 = Guidance
     var currentStep by remember { mutableStateOf(1) }
-    var selectedSkillIds by remember { mutableStateOf(emptySet<String>()) }
-    var selectedCapitalKes by remember { mutableStateOf<Int?>(25000) }
-    var userName by remember { mutableStateOf("Joe Dev") }
-    var userEmail by remember { mutableStateOf("joe.dev@example.com") }
 
+    // Restore previously saved selections from the backend.
+    var selectedSkillIds by remember(initialSelectedSkillIds) {
+        mutableStateOf(initialSelectedSkillIds)
+    }
+
+    var selectedCapitalKes by remember {
+        mutableStateOf<Int?>(25000)
+    }
+
+    var userName by remember {
+        mutableStateOf("Joe Dev")
+    }
+
+    var userEmail by remember {
+        mutableStateOf("joe.dev@example.com")
+    }
+    
     Box(
         modifier = Modifier
             .fillMaxSize()

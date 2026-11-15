@@ -74,6 +74,13 @@ class MainActivity : ComponentActivity() {
                 var accountProfile by remember {
                     mutableStateOf<AccountProfileDto?>(null)
                 }
+                var savedSkillIds by remember {
+                    mutableStateOf<Set<String>>(emptySet())
+                }
+
+                var isLoadingSavedSkills by remember {
+                    mutableStateOf(false)
+                }
 
                 var currentScreen by remember {
                     mutableStateOf(Screen.HOME)
@@ -121,6 +128,41 @@ class MainActivity : ComponentActivity() {
 
                         accountProfile = null
                         entryState = AppEntryState.AUTHENTICATION
+                    }
+                }
+
+                // -------------------------------------------------
+                // LOAD SAVED USER SKILL SELECTIONS
+                // -------------------------------------------------
+
+                LaunchedEffect(accountProfile, entryState) {
+
+                    if (
+                        entryState == AppEntryState.ONBOARDING &&
+                        accountProfile != null
+                    ) {
+
+                        isLoadingSavedSkills = true
+
+                        try {
+
+                            val selection = accountRepository.getMySkillSelection()
+
+                            savedSkillIds = selection.skillIds.toSet()
+
+                        } catch (e: Exception) {
+
+                            savedSkillIds = emptySet()
+
+                        } finally {
+
+                            isLoadingSavedSkills = false
+                        }
+
+                    } else {
+
+                        savedSkillIds = emptySet()
+                        isLoadingSavedSkills = false
                     }
                 }
 
@@ -222,51 +264,80 @@ class MainActivity : ComponentActivity() {
                             mutableStateOf(false)
                         }
 
-                        OnboardingFlow(
-                            availableSkills = uiState.allSkills,
+                        if (isLoadingSavedSkills) {
 
-                            onFinishOnboarding = {
-                                name,
-                                email,
-                                selectedSkills,
-                                capital ->
+                            Surface(
+                                modifier = Modifier.fillMaxSize(),
+                                color = Color.White
+                            ) {
 
-                                if (!isSavingOnboarding) {
-                                    isSavingOnboarding = true
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
 
-                                    coroutineScope.launch {
-                                        try {
-                                            // Save selected skills to the authenticated user's
-                                            // UserSkillSelection record in PostgreSQL.
-                                            accountRepository.saveMySkillSelection(
-                                                skillIds = selectedSkills.toList(),
-                                                customSkills = emptyList()
-                                            )
+                                    CircularProgressIndicator(
+                                        color = KenyanGreen
+                                    )
+                                }
+                            }
 
-                                            // Complete the existing local onboarding process.
-                                            viewModel.completeOnboarding(
-                                                name = name,
-                                                email = email,
-                                                selectedSkillIds = selectedSkills,
-                                                capitalKes = capital
-                                            )
+                        } else {
 
-                                            entryState = AppEntryState.MAIN
+                            OnboardingFlow(
 
-                                        } catch (e: Exception) {
+                                availableSkills = uiState.allSkills,
 
-                                            snackbarHostState.showSnackbar(
-                                                "Could not save your selections. Please try again."
-                                            )
+                                // Restore skills previously saved in PostgreSQL.
+                                initialSelectedSkillIds = savedSkillIds,
 
-                                        } finally {
-                                            isSavingOnboarding = false
+                                onFinishOnboarding = {
+                                    name,
+                                    email,
+                                    selectedSkills,
+                                    capital ->
+
+                                    if (!isSavingOnboarding) {
+
+                                        isSavingOnboarding = true
+
+                                        coroutineScope.launch {
+
+                                            try {
+
+                                                // SAVE SKILLS TO AUTHENTICATED USER RECORD.
+                                                accountRepository.saveMySkillSelection(
+                                                    skillIds = selectedSkills.toList(),
+                                                    customSkills = emptyList()
+                                                )
+
+                                                // COMPLETE ONBOARDING AFTER SUCCESSFUL SAVE.
+                                                viewModel.completeOnboarding(
+                                                    name = name,
+                                                    email = email,
+                                                    selectedSkillIds = selectedSkills,
+                                                    capitalKes = capital
+                                                )
+
+                                                entryState = AppEntryState.MAIN
+
+                                            } catch (e: Exception) {
+
+                                                snackbarHostState.showSnackbar(
+                                                    "Could not save your selections. Please try again."
+                                                )
+
+                                            } finally {
+
+                                                isSavingOnboarding = false
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
+
                     AppEntryState.MAIN -> {
 
                         // Defensive protection against an absent profile.
