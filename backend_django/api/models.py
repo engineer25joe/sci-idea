@@ -169,6 +169,8 @@ class Skill(models.Model):
     def __str__(self):
         return self.name
 
+    research_sources = models.JSONField(default=list, blank=True)
+
 
 class UserSkillSelection(models.Model):
     user = models.OneToOneField(

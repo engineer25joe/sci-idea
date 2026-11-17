@@ -18,6 +18,12 @@ class AccountProfile(models.Model):
         db_index=True,
     )
 
+    starting_capital_kes = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        default=None,
+    )
+
     email_verified = models.BooleanField(default=False, db_index=True)
     suspended_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

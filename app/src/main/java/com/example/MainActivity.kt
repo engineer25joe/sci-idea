@@ -132,6 +132,18 @@ class MainActivity : ComponentActivity() {
                 }
 
                 // -------------------------------------------------
+                // RESTORE SAVED STARTING CAPITAL
+                // -------------------------------------------------
+
+                LaunchedEffect(accountProfile) {
+
+                    accountProfile?.startingCapitalKes?.let { savedCapital ->
+
+                        viewModel.setExactCapital(savedCapital)
+                    }
+                }
+
+                // -------------------------------------------------
                 // LOAD SAVED USER SKILL SELECTIONS
                 // -------------------------------------------------
 
@@ -291,6 +303,10 @@ class MainActivity : ComponentActivity() {
                                 // Restore skills previously saved in PostgreSQL.
                                 initialSelectedSkillIds = savedSkillIds,
 
+                                // Restore starting capital previously saved in DataBase.
+                                initialSelectedCapitalKes =
+                                    accountProfile?.startingCapitalKes ?: 25000,
+
                                 onFinishOnboarding = {
                                     name,
                                     email,
@@ -305,6 +321,9 @@ class MainActivity : ComponentActivity() {
 
                                             try {
 
+                                                // SAVE CAPITAL TO AUTHENTICATED USER RECORD.
+                                                accountProfile = accountRepository.saveStartingCapital(capital)
+                                                
                                                 // SAVE SKILLS TO AUTHENTICATED USER RECORD.
                                                 accountRepository.saveMySkillSelection(
                                                     skillIds = selectedSkills.toList(),

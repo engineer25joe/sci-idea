@@ -49,8 +49,14 @@ data class LogoutRequest(val refresh: String)
 
 @JsonClass(generateAdapter = true)
 data class ProfileUpdateRequest(
-    @Json(name = "first_name") val firstName: String,
-    @Json(name = "last_name") val lastName: String,
+    @Json(name = "first_name")
+    val firstName: String? = null,
+
+    @Json(name = "last_name")
+    val lastName: String? = null,
+
+    @Json(name = "starting_capital_kes")
+    val startingCapitalKes: Int? = null,
 )
 
 @JsonClass(generateAdapter = true)
@@ -61,6 +67,7 @@ data class AccountProfileDto(
     @Json(name = "last_name") val lastName: String = "",
     @Json(name = "created_at") val createdAt: String? = null,
     @Json(name = "phone_number") val phoneNumber: String? = null,
+    @Json(name = "starting_capital_kes") val startingCapitalKes: Int? = null,
 )
 
 @JsonClass(generateAdapter = true)

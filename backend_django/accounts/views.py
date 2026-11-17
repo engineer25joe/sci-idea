@@ -339,32 +339,38 @@ class PasswordResetConfirmView(LimitedRequestAPIView):
             }
         )
 
-
 class AccountProfileView(LimitedRequestAPIView):
     permission_classes = [IsVerifiedAccount]
 
     def get(self, request):
-        profile, _ = AccountProfile.objects.get_or_create(user=request.user)
+        profile, _ = AccountProfile.objects.get_or_create(
+            user=request.user
+        )
         return Response(AccountProfileSerializer(profile).data)
 
     def patch(self, request):
         serializer = AccountProfileUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        data = serializer.validated_data
         user = request.user
 
+        user_fields = []
+
         for field in ("first_name", "last_name"):
-            if field in serializer.validated_data:
-                setattr(user, field, serializer.validated_data[field])
+            if field in data:
+                setattr(user, field, data[field])
+                user_fields.append(field)
 
-        user.save(
-            update_fields=[
-                field
-                for field in ("first_name", "last_name")
-                if field in serializer.validated_data
-            ]
-        )
+        if user_fields:
+            user.save(update_fields=user_fields)
 
-        return Response(
-            AccountProfileSerializer(user.account_profile).data
-        )
+        profile, _ = AccountProfile.objects.get_or_create(user=user)
+
+        if "starting_capital_kes" in data:
+            profile.starting_capital_kes = data["starting_capital_kes"]
+            profile.save(
+                update_fields=["starting_capital_kes", "updated_at"]
+            )
+
+        return Response(AccountProfileSerializer(profile).data)

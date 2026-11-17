@@ -153,6 +153,7 @@ class AccountProfileSerializer(serializers.ModelSerializer):
         source="user.last_name", read_only=True
     )
     email_verified = serializers.BooleanField(read_only=True)
+    starting_capital_kes = serializers.IntegerField(read_only=True, allow_null=True)
 
     class Meta:
         model = AccountProfile
@@ -162,17 +163,27 @@ class AccountProfileSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email_verified",
+            "starting_capital_kes",
             "created_at",
         ]
         read_only_fields = fields
 
-
 class AccountProfileUpdateSerializer(serializers.Serializer):
     first_name = serializers.CharField(
-        max_length=150, required=False, allow_blank=True
+        max_length=150,
+        required=False,
+        allow_blank=True,
     )
     last_name = serializers.CharField(
-        max_length=150, required=False, allow_blank=True
+        max_length=150,
+        required=False,
+        allow_blank=True,
+    )
+    starting_capital_kes = serializers.IntegerField(
+        required=False,
+        allow_null=True,
+        min_value=0,
+        max_value=100000000,
     )
 
     def validate(self, attrs):
@@ -180,5 +191,4 @@ class AccountProfileUpdateSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 "Provide at least one profile field."
             )
-
         return attrs

@@ -85,13 +85,24 @@ Requirements:
 - Skills must be teachable and practically useful.
 - Descriptions must explain what the person can actually do.
 - Do not invent certifications or guaranteed earnings.
+- Research current practical opportunities using Google Search.
+- Prioritize credible sources relevant to Kenya and Africa.
+- Base descriptions on researched information.
+- Do not fabricate source URLs.
 """
 
-        result = self.gemini.generate_json(
+        result = self.gemini.generate_json_with_search(
             prompt=prompt,
             system_instruction=SYSTEM_INSTRUCTION,
         )
 
+        research_sources = result.pop("_grounding_sources", [])
+
+        if not research_sources:
+            raise GeminiServiceError(
+                "No Google Search sources were returned. "
+                "Skills cannot be submitted without research references."
+            )
         generated = result.get("skills")
 
         if not isinstance(generated, list) or len(generated) != 10:
@@ -189,6 +200,7 @@ Requirements:
                     review_status="PENDING",
                     submitted_for_review_at=now,
                     auto_publish_at=deadline,
+                    research_sources=research_sources,
                 )
 
                 created.append(skill)

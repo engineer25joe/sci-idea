@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 fun OnboardingFlow(
     availableSkills: List<Skill>,
     initialSelectedSkillIds: Set<String> = emptySet(),
+    initialSelectedCapitalKes: Int? = 25000,
     onFinishOnboarding: (
         name: String,
         email: String,
@@ -47,8 +48,8 @@ fun OnboardingFlow(
         mutableStateOf(initialSelectedSkillIds)
     }
 
-    var selectedCapitalKes by remember {
-        mutableStateOf<Int?>(25000)
+    var selectedCapitalKes by remember(initialSelectedCapitalKes) {
+        mutableStateOf(initialSelectedCapitalKes)
     }
 
     var userName by remember {

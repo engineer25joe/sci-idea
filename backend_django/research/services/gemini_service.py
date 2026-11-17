@@ -134,3 +134,112 @@ class GeminiService:
                 raise GeminiServiceError(
                     "Gemini request failed due to an unexpected error."
                 ) from exc
+    def generate_json_with_search(self, prompt, system_instruction=None):
+        """Generate JSON using live Google Search grounding."""
+
+        if not prompt or not prompt.strip():
+            raise GeminiServiceError("Prompt cannot be empty.")
+
+        for attempt in range(1, MAX_ATTEMPTS + 1):
+            try:
+                response = self.client.models.generate_content(
+                    model=self.model,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=system_instruction,
+                        response_mime_type="application/json",
+                        temperature=0.3,
+                        tools=[
+                            types.Tool(
+                                google_search=types.GoogleSearch()
+                            )
+                        ],
+                    ),
+                )
+
+                if not response.text:
+                    raise GeminiServiceError(
+                        "Gemini returned an empty response."
+                    )
+
+                result = json.loads(response.text)
+
+                if not isinstance(result, dict):
+                    raise GeminiServiceError(
+                        "Unexpected Gemini response format."
+                    )
+
+                sources = []
+                candidates = getattr(response, "candidates", None) or []
+
+                if candidates:
+                    metadata = getattr(
+                        candidates[0],
+                        "grounding_metadata",
+                        None,
+                    )
+
+                    chunks = getattr(
+                        metadata,
+                        "grounding_chunks",
+                        None,
+                    ) or []
+
+                    for chunk in chunks:
+                        web_source = getattr(chunk, "web", None)
+
+                        if not web_source:
+                            continue
+
+                        uri = getattr(web_source, "uri", None)
+                        title = getattr(web_source, "title", None)
+
+                        if uri and uri.startswith(("https://", "http://")):
+                            sources.append({
+                                "title": (title or uri)[:300],
+                                "url": uri[:1000],
+                            })
+
+                result["_grounding_sources"] = sources
+                return result
+
+            except GeminiServiceError:
+                raise
+
+            except RETRYABLE_EXCEPTIONS as exc:
+                status_code = getattr(exc, "code", None)
+
+                if status_code is None:
+                    status_code = getattr(exc, "status_code", None)
+
+                retryable = (
+                    isinstance(exc, RETRYABLE_NETWORK_ERRORS)
+                    or status_code in RETRYABLE_STATUS_CODES
+                )
+
+                if not retryable:
+                    raise GeminiServiceError(
+                        "Grounded Gemini request failed. Check model and API configuration."
+                    ) from exc
+
+                if attempt == MAX_ATTEMPTS:
+                    raise GeminiRetriesExhaustedError(
+                        "Google Search-grounded Gemini request exhausted retries."
+                    ) from exc
+
+                time.sleep(
+                    min(
+                        INITIAL_BACKOFF_SECONDS * (2 ** (attempt - 1)),
+                        MAX_BACKOFF_SECONDS,
+                    )
+                )
+
+            except json.JSONDecodeError as exc:
+                raise GeminiServiceError(
+                    "Gemini returned invalid JSON."
+                ) from exc
+
+            except Exception as exc:
+                raise GeminiServiceError(
+                    "Grounded Gemini request failed unexpectedly."
+                ) from exc

@@ -155,6 +155,18 @@ class AccountRepository(
             )
         }
 
+    suspend fun saveStartingCapital(
+        capitalKes: Int?
+    ): AccountProfileDto =
+        authorized {
+            api.updateProfile(
+                it,
+                ProfileUpdateRequest(
+                    startingCapitalKes = capitalKes
+                )
+            )
+        }
+
     suspend fun getAvailableSkills(): List<SkillDto> =
         authorized {
             skillsApi.getSkills(it)
