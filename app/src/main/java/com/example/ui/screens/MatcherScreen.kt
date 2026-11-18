@@ -1,6 +1,7 @@
 package com.example.ui.screens
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -41,18 +43,25 @@ fun MatcherScreen(
     modifier: Modifier = Modifier
 ) {
     var customSkillInput by remember { mutableStateOf("") }
+
     var exactCapitalText by remember(uiState.exactCapitalKes) {
         mutableStateOf(uiState.exactCapitalKes?.toString() ?: "")
     }
+
     var showAllReadyNow by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
+            .background(SurfaceCream)
             .testTag("matcher_screen"),
-        contentPadding = PaddingValues(bottom = 96.dp)
+        contentPadding = PaddingValues(bottom = 100.dp)
     ) {
-        // Hero Header with SCI BASE Ecosystem Brand Bar
+
+        // ---------------------------------------------------------
+        // HERO HEADER
+        // ---------------------------------------------------------
+
         item {
             Box(
                 modifier = Modifier
@@ -65,162 +74,317 @@ fun MatcherScreen(
                             )
                         )
                     )
-                    .padding(horizontal = 20.dp, vertical = 22.dp)
             ) {
-                Column {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 22.dp)
+                ) {
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(7.dp)
+                            ) {
                                 Surface(
-                                    shape = RoundedCornerShape(4.dp),
                                     color = SciRedAccent,
-                                    modifier = Modifier.padding(end = 6.dp)
+                                    shape = RoundedCornerShape(5.dp)
                                 ) {
                                     Text(
                                         text = "SCI BASE",
-                                        style = MaterialTheme.typography.labelSmall.copy(
-                                            color = Color.White,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 9.sp
+                                        modifier = Modifier.padding(
+                                            horizontal = 8.dp,
+                                            vertical = 4.dp
                                         ),
-                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        color = Color.White,
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.ExtraBold
                                     )
                                 }
+
                                 Text(
                                     text = "🇰🇪 BiasharaHub KE",
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        color = KenyaGold,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    color = KenyaGold,
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.titleMedium
                                 )
                             }
-                            Spacer(modifier = Modifier.height(2.dp))
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
                             Text(
                                 text = "Tafuta Biashara Yako",
-                                style = MaterialTheme.typography.headlineSmall.copy(
-                                    color = Color.White,
-                                    fontWeight = FontWeight.ExtraBold
-                                )
+                                color = Color.White,
+                                fontSize = 27.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                lineHeight = 33.sp
+                            )
+
+                            Spacer(modifier = Modifier.height(5.dp))
+
+                            Text(
+                                text = "Discover opportunities built around your skills, capital and ambitions.",
+                                color = Color.White.copy(alpha = 0.84f),
+                                style = MaterialTheme.typography.bodyMedium,
+                                lineHeight = 20.sp
                             )
                         }
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            // Compare button (if items selected)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             if (uiState.comparedIdeaIds.isNotEmpty()) {
                                 Surface(
-                                    shape = RoundedCornerShape(10.dp),
+                                    shape = CircleShape,
                                     color = KenyaGold,
-                                    modifier = Modifier.clickable { viewModel.openCompareSheet() }
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .clickable {
+                                            viewModel.openCompareSheet()
+                                        }
                                 ) {
-                                    Row(
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                    ) {
+                                    Box(contentAlignment = Alignment.Center) {
                                         Icon(
                                             imageVector = Icons.Default.CompareArrows,
-                                            contentDescription = "Compare",
-                                            tint = Color.Black,
-                                            modifier = Modifier.size(16.dp)
+                                            contentDescription = "Compare ideas",
+                                            tint = Color.Black
                                         )
-                                        Text(
-                                            text = "${uiState.comparedIdeaIds.size}",
-                                            style = MaterialTheme.typography.labelMedium.copy(
-                                                color = Color.Black,
+
+                                        Box(
+                                            modifier = Modifier
+                                                .align(Alignment.TopEnd)
+                                                .size(17.dp)
+                                                .background(
+                                                    SciRedAccent,
+                                                    CircleShape
+                                                ),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = uiState.comparedIdeaIds.size.toString(),
+                                                color = Color.White,
+                                                fontSize = 9.sp,
                                                 fontWeight = FontWeight.Bold
                                             )
-                                        )
+                                        }
                                     }
                                 }
                             }
 
-                            // About App Info Button
                             IconButton(
-                                onClick = { viewModel.openAboutDialog() },
-                                modifier = Modifier.size(36.dp)
+                                onClick = { viewModel.openAboutDialog() }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Info,
-                                    contentDescription = "About App",
+                                    contentDescription = "About BiasharaHub",
                                     tint = Color.White
                                 )
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Quick navigation links
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(9.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = onNavigateToTrends,
+                            border = BorderStroke(
+                                1.dp,
+                                Color.White.copy(alpha = 0.4f)
+                            ),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(
+                                horizontal = 12.dp,
+                                vertical = 8.dp
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.TrendingUp,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Text("Market Trends", fontSize = 11.sp)
+                        }
+
+                        OutlinedButton(
+                            onClick = onNavigateToStories,
+                            border = BorderStroke(
+                                1.dp,
+                                Color.White.copy(alpha = 0.4f)
+                            ),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(
+                                horizontal = 12.dp,
+                                vertical = 8.dp
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.AutoStories,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Text("Success Stories", fontSize = 11.sp)
+                        }
+                    }
+                }
+            }
+        }
+
+        // ---------------------------------------------------------
+        // DISCOVERY MODE
+        // ---------------------------------------------------------
+
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .offset(y = (-8).dp),
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = SurfaceCard
+                ),
+                elevation = CardDefaults.cardElevation(3.dp)
+            ) {
+                Column(modifier = Modifier.padding(15.dp)) {
+
                     Text(
-                        text = "Deterministic, 100% offline recommendation engine matching your personal skills and exact starting capital in KSh to viable Kenyan businesses.",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = Color.White.copy(alpha = 0.9f),
-                            lineHeight = 18.sp
-                        )
-                    )
-                }
-            }
-        }
-
-        // Discovery Mode Selector Tabs (Quick Discovery vs Detailed Discovery)
-        item {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-            ) {
-                TabRow(
-                    selectedTabIndex = if (uiState.discoveryMode == DiscoveryMode.QUICK) 0 else 1,
-                    containerColor = SurfaceCard,
-                    contentColor = SciBluePrimary
-                ) {
-                    Tab(
-                        selected = uiState.discoveryMode == DiscoveryMode.QUICK,
-                        onClick = { viewModel.setDiscoveryMode(DiscoveryMode.QUICK) },
-                        text = {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Icon(imageVector = Icons.Default.Bolt, contentDescription = "Quick", modifier = Modifier.size(16.dp))
-                                Text("Quick Discovery", fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    )
-                    Tab(
-                        selected = uiState.discoveryMode == DiscoveryMode.DETAILED,
-                        onClick = { viewModel.setDiscoveryMode(DiscoveryMode.DETAILED) },
-                        text = {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Icon(imageVector = Icons.Default.Tune, contentDescription = "Detailed", modifier = Modifier.size(16.dp))
-                                Text("Detailed Profile", fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    )
-                }
-            }
-        }
-
-        // Step 1: Skills Selection
-        item {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 6.dp)
-                    .testTag("skills_card"),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    SectionHeader(
-                        title = "1. Your Skills & Talents",
-                        subtitle = "Select what you already know or do best (${uiState.selectedSkillIds.size} selected)"
+                        text = "CHOOSE YOUR DISCOVERY MODE",
+                        color = TextSecondary,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                SurfaceVariantWarm,
+                                RoundedCornerShape(12.dp)
+                            )
+                            .padding(4.dp)
+                    ) {
+                        DiscoveryMode.values().forEach { mode ->
+
+                            val selected = uiState.discoveryMode == mode
+
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .background(
+                                        if (selected) SciRedAccent
+                                        else Color.Transparent,
+                                        RoundedCornerShape(10.dp)
+                                    )
+                                    .clickable {
+                                        viewModel.setDiscoveryMode(mode)
+                                    }
+                                    .padding(
+                                        horizontal = 8.dp,
+                                        vertical = 11.dp
+                                    ),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    imageVector = if (
+                                        mode == DiscoveryMode.QUICK
+                                    ) {
+                                        Icons.Default.Bolt
+                                    } else {
+                                        Icons.Default.Tune
+                                    },
+                                    contentDescription = null,
+                                    tint = if (selected) {
+                                        Color.White
+                                    } else {
+                                        SciBluePrimary
+                                    },
+                                    modifier = Modifier.size(20.dp)
+                                )
+
+                                Spacer(modifier = Modifier.height(4.dp))
+
+                                Text(
+                                    text = if (
+                                        mode == DiscoveryMode.QUICK
+                                    ) "Quick Discovery"
+                                    else "Detailed Profile",
+                                    color = if (selected) {
+                                        Color.White
+                                    } else {
+                                        TextPrimary
+                                    },
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 11.sp
+                                )
+
+                                Text(
+                                    text = if (
+                                        mode == DiscoveryMode.QUICK
+                                    ) "Simple matching"
+                                    else "More filters",
+                                    color = if (selected) {
+                                        Color.White.copy(alpha = 0.8f)
+                                    } else {
+                                        TextSecondary
+                                    },
+                                    fontSize = 9.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // ---------------------------------------------------------
+        // SECTION 1: SKILLS
+        // ---------------------------------------------------------
+
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 5.dp)
+                    .testTag("skills_card"),
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = SurfaceCard
+                ),
+                elevation = CardDefaults.cardElevation(1.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+
+                    MatcherSectionHeading(
+                        number = "01",
+                        title = "Your Skills & Talents",
+                        subtitle = "What can you already do?",
+                        badge = "${uiState.selectedSkillIds.size} selected"
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),
@@ -228,52 +392,76 @@ fun MatcherScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         uiState.allSkills.take(18).forEach { skill ->
-                            val isSelected = uiState.selectedSkillIds.contains(skill.id)
+
+                            val selected =
+                                uiState.selectedSkillIds.contains(skill.id)
+
                             SkillChip(
                                 text = skill.name,
-                                isSelected = isSelected,
-                                onClick = { viewModel.toggleSkill(skill.id) },
-                                modifier = Modifier.testTag("skill_chip_${skill.id}")
+                                isSelected = selected,
+                                onClick = {
+                                    viewModel.toggleSkill(skill.id)
+                                },
+                                modifier = Modifier.testTag(
+                                    "skill_chip_${skill.id}"
+                                )
                             )
                         }
                     }
 
-                    // Custom user skill tags display
                     if (uiState.customSkills.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Spacer(modifier = Modifier.height(15.dp))
+
                         Text(
-                            text = "Custom Skills Added:",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.SemiBold,
-                                color = SciBluePrimary
-                            )
+                            text = "YOUR CUSTOM SKILLS",
+                            color = SciBluePrimary,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.8.sp
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
                         FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                            horizontalArrangement = Arrangement.spacedBy(7.dp),
+                            verticalArrangement = Arrangement.spacedBy(7.dp)
                         ) {
                             uiState.customSkills.forEach { custom ->
+
                                 Surface(
-                                    shape = RoundedCornerShape(16.dp),
                                     color = SciBlueContainer,
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, SciBluePrimary.copy(alpha = 0.3f))
+                                    shape = RoundedCornerShape(20.dp),
+                                    border = BorderStroke(
+                                        1.dp,
+                                        SciBluePrimary.copy(alpha = 0.18f)
+                                    )
                                 ) {
                                     Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.padding(start = 10.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)
+                                        modifier = Modifier.padding(
+                                            start = 11.dp,
+                                            end = 3.dp,
+                                            top = 3.dp,
+                                            bottom = 3.dp
+                                        ),
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
                                             text = custom,
-                                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium)
+                                            color = SciBluePrimary,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Medium
                                         )
+
                                         IconButton(
-                                            onClick = { viewModel.removeCustomSkill(custom) },
-                                            modifier = Modifier.size(24.dp)
+                                            onClick = {
+                                                viewModel.removeCustomSkill(custom)
+                                            },
+                                            modifier = Modifier.size(25.dp)
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Close,
-                                                contentDescription = "Remove skill",
+                                                contentDescription = "Remove $custom",
                                                 tint = SciRedAccent,
                                                 modifier = Modifier.size(14.dp)
                                             )
@@ -284,229 +472,437 @@ fun MatcherScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(15.dp))
 
-                    // Custom Skill Input Row
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        OutlinedTextField(
-                            value = customSkillInput,
-                            onValueChange = { customSkillInput = it },
-                            placeholder = { Text("Add custom skill (e.g. Beadwork, Drone, Coding)") },
-                            singleLine = true,
-                            modifier = Modifier
-                                .weight(1f)
-                                .testTag("custom_skill_input"),
-                            shape = RoundedCornerShape(12.dp)
+                    OutlinedTextField(
+                        value = customSkillInput,
+                        onValueChange = {
+                            customSkillInput = it
+                        },
+                        placeholder = {
+                            Text(
+                                "Add another skill...",
+                                fontSize = 12.sp
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.AddCircleOutline,
+                                contentDescription = null,
+                                tint = SciBluePrimary
+                            )
+                        },
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("custom_skill_input")
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(
+                        onClick = {
+                            if (customSkillInput.isNotBlank()) {
+                                viewModel.addCustomSkill(
+                                    customSkillInput.trim()
+                                )
+                                customSkillInput = ""
+                            }
+                        },
+                        enabled = customSkillInput.isNotBlank(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(45.dp)
+                            .testTag("add_custom_skill_btn"),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = SciRedAccent
                         )
-                        Button(
-                            onClick = {
-                                if (customSkillInput.isNotBlank()) {
-                                    viewModel.addCustomSkill(customSkillInput)
-                                    customSkillInput = ""
-                                }
-                            },
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = SciBluePrimary),
-                            modifier = Modifier.testTag("add_custom_skill_btn")
-                        ) {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.width(7.dp))
+                        Text(
+                            "Add Custom Skill",
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
         }
 
-        // Step 2: Capital & Budget (Exact + Brackets)
+        // ---------------------------------------------------------
+        // SECTION 2: CAPITAL
+        // ---------------------------------------------------------
+
         item {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 6.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = SurfaceCard
+                ),
+                elevation = CardDefaults.cardElevation(1.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    SectionHeader(
-                        title = "2. Available Startup Capital",
-                        subtitle = "Enter your exact cash in KSh or choose a budget bracket"
+
+                    MatcherSectionHeading(
+                        number = "02",
+                        title = "Your Starting Capital",
+                        subtitle = "How much can you invest?"
                     )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     OutlinedTextField(
                         value = exactCapitalText,
-                        onValueChange = {
-                            exactCapitalText = it
-                            val parsed = it.toIntOrNull()
-                            viewModel.setExactCapital(parsed)
+                        onValueChange = { input ->
+                            val cleanInput = input.filter { it.isDigit() }
+                            exactCapitalText = cleanInput
+                            viewModel.setExactCapital(
+                                cleanInput.toIntOrNull()
+                            )
                         },
-                        label = { Text("Exact Capital Available (KSh)") },
-                        placeholder = { Text("e.g. 15,000") },
+                        label = {
+                            Text("Available capital (KSh)")
+                        },
+                        placeholder = {
+                            Text("e.g. 15000")
+                        },
                         leadingIcon = {
                             Text(
                                 text = "KSh",
-                                fontWeight = FontWeight.Bold,
-                                color = SciBluePrimary,
-                                modifier = Modifier.padding(start = 12.dp, end = 6.dp)
+                                color = SciRedAccent,
+                                fontWeight = FontWeight.ExtraBold,
+                                modifier = Modifier.padding(start = 12.dp)
                             )
                         },
                         trailingIcon = {
                             if (exactCapitalText.isNotEmpty()) {
-                                IconButton(onClick = {
-                                    exactCapitalText = ""
-                                    viewModel.setExactCapital(null)
-                                }) {
-                                    Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear")
+                                IconButton(
+                                    onClick = {
+                                        exactCapitalText = ""
+                                        viewModel.setExactCapital(null)
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Default.Clear,
+                                        contentDescription = "Clear capital"
+                                    )
                                 }
                             }
                         },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        ),
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth().testTag("exact_capital_input"),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("exact_capital_input")
                     )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     Text(
-                        text = "Or choose a quick budget tier:",
-                        style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary)
+                        text = "QUICK CAPITAL RANGES",
+                        color = TextSecondary,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.8.sp
                     )
 
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(9.dp))
 
                     Row(
-                        modifier = Modifier.horizontalScroll(rememberScrollState()),
+                        modifier = Modifier.horizontalScroll(
+                            rememberScrollState()
+                        ),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+
                         FilterChip(
-                            selected = uiState.selectedCapitalTier == null && uiState.exactCapitalKes == null,
+                            selected = uiState.selectedCapitalTier == null &&
+                                uiState.exactCapitalKes == null,
                             onClick = {
                                 exactCapitalText = ""
                                 viewModel.setCapitalTier(null)
                             },
-                            label = { Text("Any Budget") }
+                            label = { Text("Any Budget") },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = SciRedAccent,
+                                selectedLabelColor = Color.White
+                            )
                         )
+
                         CapitalTier.values().forEach { tier ->
+
                             FilterChip(
                                 selected = uiState.selectedCapitalTier == tier,
                                 onClick = {
                                     exactCapitalText = tier.maxKes.toString()
                                     viewModel.setCapitalTier(tier)
                                 },
-                                label = { Text(tier.label) }
+                                label = {
+                                    Text(tier.label)
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = SciRedAccent,
+                                    selectedLabelColor = Color.White
+                                )
                             )
                         }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Lightbulb,
+                            contentDescription = null,
+                            tint = KenyaGoldDark,
+                            modifier = Modifier.size(16.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(6.dp))
+
+                        Text(
+                            text = "Your recommendations adjust to your available capital.",
+                            color = TextSecondary,
+                            fontSize = 10.sp
+                        )
                     }
                 }
             }
         }
 
-        // Step 3: Interests & Detailed Profile Criteria (if in Detailed Mode)
+        // ---------------------------------------------------------
+        // SECTION 3: INTERESTS
+        // ---------------------------------------------------------
+
         item {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 6.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = SurfaceCard
+                ),
+                elevation = CardDefaults.cardElevation(1.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    SectionHeader(
-                        title = "3. Areas of Interest & Setting",
-                        subtitle = "Align opportunities with your passion and county environment"
+
+                    MatcherSectionHeading(
+                        number = "03",
+                        title = "Areas of Interest",
+                        subtitle = "Which industries excite you?"
                     )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(13.dp))
 
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                        horizontalArrangement = Arrangement.spacedBy(7.dp),
+                        verticalArrangement = Arrangement.spacedBy(7.dp)
                     ) {
                         InterestArea.values().forEach { interest ->
-                            val isSelected = uiState.selectedInterests.contains(interest)
+
+                            val selected =
+                                uiState.selectedInterests.contains(interest)
+
                             FilterChip(
-                                selected = isSelected,
-                                onClick = { viewModel.toggleInterest(interest) },
-                                label = { Text(interest.shengLabel, fontSize = 12.sp) },
+                                selected = selected,
+                                onClick = {
+                                    viewModel.toggleInterest(interest)
+                                },
+                                label = {
+                                    Text(
+                                        interest.shengLabel,
+                                        fontSize = 11.sp
+                                    )
+                                },
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = KenyaGold,
-                                    selectedLabelColor = Color.Black
+                                    selectedContainerColor = SciBluePrimary,
+                                    selectedLabelColor = Color.White
                                 )
                             )
                         }
                     }
+                }
+            }
+        }
 
-                    if (uiState.discoveryMode == DiscoveryMode.DETAILED) {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Divider()
-                        Spacer(modifier = Modifier.height(12.dp))
+        // ---------------------------------------------------------
+        // DETAILED PROFILE FILTERS
+        // ---------------------------------------------------------
+
+        if (uiState.discoveryMode == DiscoveryMode.DETAILED) {
+
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                    shape = RoundedCornerShape(18.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = SurfaceCard
+                    ),
+                    elevation = CardDefaults.cardElevation(1.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Surface(
+                                color = SciBlueContainer,
+                                shape = RoundedCornerShape(9.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Tune,
+                                    contentDescription = null,
+                                    tint = SciBluePrimary,
+                                    modifier = Modifier
+                                        .padding(9.dp)
+                                        .size(19.dp)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            Column {
+                                Text(
+                                    "Advanced Preferences",
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextPrimary
+                                )
+                                Text(
+                                    "Fine-tune your business matches",
+                                    color = TextSecondary,
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
+
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 14.dp),
+                            color = SurfaceBorder
+                        )
 
                         // Equipment
+
                         Text(
-                            text = "Existing Equipment & Resources You Own:",
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                            "EQUIPMENT & RESOURCES",
+                            color = SciBluePrimary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp,
+                            letterSpacing = 0.8.sp
                         )
-                        Spacer(modifier = Modifier.height(6.dp))
+
+                        Spacer(modifier = Modifier.height(9.dp))
+
                         FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                            horizontalArrangement = Arrangement.spacedBy(7.dp),
+                            verticalArrangement = Arrangement.spacedBy(7.dp)
                         ) {
                             EquipmentResource.values().forEach { equip ->
-                                val isSelected = uiState.selectedEquipmentIds.contains(equip.id)
+
                                 FilterChip(
-                                    selected = isSelected,
-                                    onClick = { viewModel.toggleEquipment(equip.id) },
-                                    label = { Text(equip.label, fontSize = 11.sp) }
+                                    selected = uiState.selectedEquipmentIds
+                                        .contains(equip.id),
+                                    onClick = {
+                                        viewModel.toggleEquipment(equip.id)
+                                    },
+                                    label = {
+                                        Text(
+                                            equip.label,
+                                            fontSize = 10.sp
+                                        )
+                                    }
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(18.dp))
 
-                        // Time Commitment
+                        // Available time
+
                         Text(
-                            text = "Available Weekly Time:",
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                            "TIME AVAILABLE PER WEEK",
+                            color = SciBluePrimary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp,
+                            letterSpacing = 0.8.sp
                         )
-                        Spacer(modifier = Modifier.height(6.dp))
+
+                        Spacer(modifier = Modifier.height(9.dp))
+
                         Row(
-                            modifier = Modifier.horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier = Modifier.horizontalScroll(
+                                rememberScrollState()
+                            ),
+                            horizontalArrangement = Arrangement.spacedBy(7.dp)
                         ) {
                             TimeCommitment.values().forEach { time ->
+
                                 FilterChip(
                                     selected = uiState.availableTime == time,
-                                    onClick = { viewModel.setTimeCommitment(if (uiState.availableTime == time) null else time) },
-                                    label = { Text(time.label, fontSize = 11.sp) }
+                                    onClick = {
+                                        viewModel.setTimeCommitment(
+                                            if (uiState.availableTime == time) {
+                                                null
+                                            } else {
+                                                time
+                                            }
+                                        )
+                                    },
+                                    label = {
+                                        Text(time.label, fontSize = 10.sp)
+                                    }
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(18.dp))
 
-                        // Preferred Business Model
+                        // Business model
+
                         Text(
-                            text = "Business Model Preference:",
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                            "PREFERRED BUSINESS MODEL",
+                            color = SciBluePrimary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp,
+                            letterSpacing = 0.8.sp
                         )
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Row(
-                            modifier = Modifier.horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+                        Spacer(modifier = Modifier.height(9.dp))
+
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(7.dp),
+                            verticalArrangement = Arrangement.spacedBy(7.dp)
                         ) {
                             BusinessModelType.values().forEach { model ->
+
                                 FilterChip(
                                     selected = uiState.preferredBusinessModel == model,
-                                    onClick = { viewModel.setPreferredBusinessModel(if (uiState.preferredBusinessModel == model) null else model) },
-                                    label = { Text(model.label, fontSize = 11.sp) }
+                                    onClick = {
+                                        viewModel.setPreferredBusinessModel(
+                                            if (
+                                                uiState.preferredBusinessModel == model
+                                            ) null else model
+                                        )
+                                    },
+                                    label = {
+                                        Text(model.label, fontSize = 10.sp)
+                                    }
                                 )
                             }
                         }
@@ -515,114 +911,192 @@ fun MatcherScreen(
             }
         }
 
-        // Section: Results Header & Explanation Disclaimer
+        // ---------------------------------------------------------
+        // RESULTS INTRODUCTION
+        // ---------------------------------------------------------
+
         item {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 4.dp)
+                    .padding(
+                        horizontal = 20.dp,
+                        vertical = 18.dp
+                    )
             ) {
                 Text(
-                    text = "Personalized Recommendation Results",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary
-                    )
+                    text = "Your Business Matches",
+                    color = TextPrimary,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold
                 )
-                Text(
-                    text = "*Percentages represent compatibility with your skills & capital profile, not guaranteed profit or investment return.",
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        color = TextMuted,
-                        fontSize = 11.sp
-                    )
-                )
-            }
-        }
 
-        // Section: 🟢 Ready Now Group
-        if (uiState.readyNowIdeas.isNotEmpty()) {
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "Opportunities ranked using your skills, interests and available capital.",
+                    color = TextSecondary,
+                    fontSize = 12.sp,
+                    lineHeight = 18.sp
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Surface(
+                    color = SciBlueContainer,
+                    shape = RoundedCornerShape(10.dp)
                 ) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        modifier = Modifier.padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("🟢", fontSize = 14.sp)
-                        Text(
-                            text = "Ready Now (${uiState.readyNowIdeas.size})",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = StatusReadyGreen
-                            )
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = null,
+                            tint = SciBluePrimary,
+                            modifier = Modifier.size(16.dp)
                         )
-                    }
 
-                    if (uiState.readyNowIdeas.size > 3) {
-                        TextButton(onClick = { showAllReadyNow = !showAllReadyNow }) {
-                            Text(if (showAllReadyNow) "Show Top 3" else "Explore All (${uiState.readyNowIdeas.size})")
-                        }
+                        Spacer(modifier = Modifier.width(7.dp))
+
+                        Text(
+                            text = "Match percentages indicate profile compatibility, not guaranteed profit or investment returns.",
+                            color = SciBluePrimary,
+                            fontSize = 10.sp,
+                            lineHeight = 15.sp
+                        )
                     }
                 }
             }
+        }
 
-            val displayedReadyNow = if (showAllReadyNow) uiState.readyNowIdeas else uiState.readyNowIdeas.take(3)
+        // ---------------------------------------------------------
+        // READY NOW
+        // ---------------------------------------------------------
+
+        if (uiState.readyNowIdeas.isNotEmpty()) {
+
+            item {
+                MatcherResultHeading(
+                    title = "Ready Now",
+                    subtitle = "Opportunities that align with your current resources",
+                    count = uiState.readyNowIdeas.size,
+                    color = StatusReadyGreen,
+                    icon = Icons.Default.CheckCircle
+                )
+            }
+
+            val displayedReadyNow = if (showAllReadyNow) {
+                uiState.readyNowIdeas
+            } else {
+                uiState.readyNowIdeas.take(3)
+            }
+
             items(displayedReadyNow) { idea ->
+
                 EnhancedBusinessIdeaCard(
                     idea = idea,
                     isSaved = uiState.savedIdeaIds.contains(idea.id),
                     isCompared = uiState.comparedIdeaIds.contains(idea.id),
-                    onCardClick = { viewModel.selectDetailIdea(idea) },
-                    onToggleSave = { viewModel.toggleSaveIdea(idea.id) },
-                    onToggleCompare = { viewModel.toggleCompareIdea(idea.id) },
-                    onLoadIntoCalculator = { viewModel.loadIdeaIntoCalculator(idea) },
-                    onStartJourney = { viewModel.openJourneyForIdea(idea) },
-                    onBuildBusinessPlan = { viewModel.openBusinessPlanDraft(idea) },
+                    onCardClick = {
+                        viewModel.selectDetailIdea(idea)
+                    },
+                    onToggleSave = {
+                        viewModel.toggleSaveIdea(idea.id)
+                    },
+                    onToggleCompare = {
+                        viewModel.toggleCompareIdea(idea.id)
+                    },
+                    onLoadIntoCalculator = {
+                        viewModel.loadIdeaIntoCalculator(idea)
+                    },
+                    onStartJourney = {
+                        viewModel.openJourneyForIdea(idea)
+                    },
+                    onBuildBusinessPlan = {
+                        viewModel.openBusinessPlanDraft(idea)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 6.dp)
                         .testTag("matched_idea_${idea.id}")
                 )
             }
+
+            if (uiState.readyNowIdeas.size > 3) {
+                item {
+                    TextButton(
+                        onClick = {
+                            showAllReadyNow = !showAllReadyNow
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Text(
+                            if (showAllReadyNow) {
+                                "Show Top 3"
+                            } else {
+                                "Explore All ${uiState.readyNowIdeas.size} Ready Ideas"
+                            },
+                            color = SciRedAccent,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Icon(
+                            if (showAllReadyNow) {
+                                Icons.Default.KeyboardArrowUp
+                            } else {
+                                Icons.Default.KeyboardArrowDown
+                            },
+                            contentDescription = null,
+                            tint = SciRedAccent
+                        )
+                    }
+                }
+            }
         }
 
-        // Section: 🟡 Preparation Needed Group
+        // ---------------------------------------------------------
+        // PREPARATION NEEDED
+        // ---------------------------------------------------------
+
         if (uiState.prepNeededIdeas.isNotEmpty()) {
+
             item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text("🟡", fontSize = 14.sp)
-                    Text(
-                        text = "Preparation Needed (${uiState.prepNeededIdeas.size})",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = StatusPrepYellow
-                        )
-                    )
-                }
+                MatcherResultHeading(
+                    title = "Preparation Needed",
+                    subtitle = "Good opportunities that may require extra preparation",
+                    count = uiState.prepNeededIdeas.size,
+                    color = StatusPrepYellow,
+                    icon = Icons.Default.Construction
+                )
             }
 
             items(uiState.prepNeededIdeas) { idea ->
+
                 EnhancedBusinessIdeaCard(
                     idea = idea,
                     isSaved = uiState.savedIdeaIds.contains(idea.id),
                     isCompared = uiState.comparedIdeaIds.contains(idea.id),
-                    onCardClick = { viewModel.selectDetailIdea(idea) },
-                    onToggleSave = { viewModel.toggleSaveIdea(idea.id) },
-                    onToggleCompare = { viewModel.toggleCompareIdea(idea.id) },
-                    onLoadIntoCalculator = { viewModel.loadIdeaIntoCalculator(idea) },
-                    onStartJourney = { viewModel.openJourneyForIdea(idea) },
-                    onBuildBusinessPlan = { viewModel.openBusinessPlanDraft(idea) },
+                    onCardClick = {
+                        viewModel.selectDetailIdea(idea)
+                    },
+                    onToggleSave = {
+                        viewModel.toggleSaveIdea(idea.id)
+                    },
+                    onToggleCompare = {
+                        viewModel.toggleCompareIdea(idea.id)
+                    },
+                    onLoadIntoCalculator = {
+                        viewModel.loadIdeaIntoCalculator(idea)
+                    },
+                    onStartJourney = {
+                        viewModel.openJourneyForIdea(idea)
+                    },
+                    onBuildBusinessPlan = {
+                        viewModel.openBusinessPlanDraft(idea)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 6.dp)
@@ -630,38 +1104,46 @@ fun MatcherScreen(
             }
         }
 
-        // Section: 🔵 Future Opportunities Group
+        // ---------------------------------------------------------
+        // FUTURE OPPORTUNITIES
+        // ---------------------------------------------------------
+
         if (uiState.futureIdeas.isNotEmpty()) {
+
             item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text("🔵", fontSize = 14.sp)
-                    Text(
-                        text = "Future Opportunities (${uiState.futureIdeas.size})",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = StatusFutureBlue
-                        )
-                    )
-                }
+                MatcherResultHeading(
+                    title = "Future Opportunities",
+                    subtitle = "Ideas to work towards as you grow",
+                    count = uiState.futureIdeas.size,
+                    color = StatusFutureBlue,
+                    icon = Icons.Default.TrendingUp
+                )
             }
 
             items(uiState.futureIdeas) { idea ->
+
                 EnhancedBusinessIdeaCard(
                     idea = idea,
                     isSaved = uiState.savedIdeaIds.contains(idea.id),
                     isCompared = uiState.comparedIdeaIds.contains(idea.id),
-                    onCardClick = { viewModel.selectDetailIdea(idea) },
-                    onToggleSave = { viewModel.toggleSaveIdea(idea.id) },
-                    onToggleCompare = { viewModel.toggleCompareIdea(idea.id) },
-                    onLoadIntoCalculator = { viewModel.loadIdeaIntoCalculator(idea) },
-                    onStartJourney = { viewModel.openJourneyForIdea(idea) },
-                    onBuildBusinessPlan = { viewModel.openBusinessPlanDraft(idea) },
+                    onCardClick = {
+                        viewModel.selectDetailIdea(idea)
+                    },
+                    onToggleSave = {
+                        viewModel.toggleSaveIdea(idea.id)
+                    },
+                    onToggleCompare = {
+                        viewModel.toggleCompareIdea(idea.id)
+                    },
+                    onLoadIntoCalculator = {
+                        viewModel.loadIdeaIntoCalculator(idea)
+                    },
+                    onStartJourney = {
+                        viewModel.openJourneyForIdea(idea)
+                    },
+                    onBuildBusinessPlan = {
+                        viewModel.openBusinessPlanDraft(idea)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 6.dp)
@@ -669,12 +1151,219 @@ fun MatcherScreen(
             }
         }
 
-        // Developer attribution & Copyright footer
+        // ---------------------------------------------------------
+        // EMPTY RESULTS
+        // ---------------------------------------------------------
+
+        if (
+            uiState.readyNowIdeas.isEmpty() &&
+            uiState.prepNeededIdeas.isEmpty() &&
+            uiState.futureIdeas.isEmpty()
+        ) {
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    shape = RoundedCornerShape(18.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = SurfaceCard
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Surface(
+                            color = SciRedContainer,
+                            shape = CircleShape
+                        ) {
+                            Icon(
+                                Icons.Default.Lightbulb,
+                                contentDescription = null,
+                                tint = SciRedAccent,
+                                modifier = Modifier
+                                    .padding(18.dp)
+                                    .size(34.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        Text(
+                            "Let's find your opportunity",
+                            color = TextPrimary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        Text(
+                            "Try selecting more skills, adjusting your capital or exploring different interests.",
+                            color = TextSecondary,
+                            fontSize = 12.sp,
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
+            }
+        }
+
         item {
             DeveloperFooter()
         }
     }
 }
+
+// =====================================================================
+// MATCHER SECTION HEADING
+// =====================================================================
+
+@Composable
+private fun MatcherSectionHeading(
+    number: String,
+    title: String,
+    subtitle: String,
+    badge: String? = null
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Surface(
+            color = SciRedContainer,
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Text(
+                text = number,
+                modifier = Modifier.padding(
+                    horizontal = 11.dp,
+                    vertical = 9.dp
+                ),
+                color = SciRedAccent,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 13.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.width(11.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                color = TextPrimary,
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp
+            )
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            Text(
+                text = subtitle,
+                color = TextSecondary,
+                fontSize = 11.sp
+            )
+        }
+
+        if (badge != null) {
+            Surface(
+                color = SciBlueContainer,
+                shape = RoundedCornerShape(20.dp)
+            ) {
+                Text(
+                    text = badge,
+                    modifier = Modifier.padding(
+                        horizontal = 9.dp,
+                        vertical = 5.dp
+                    ),
+                    color = SciBluePrimary,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+// =====================================================================
+// MATCHER RESULT HEADING
+// =====================================================================
+
+@Composable
+private fun MatcherResultHeading(
+    title: String,
+    subtitle: String,
+    count: Int,
+    color: Color,
+    icon: androidx.compose.ui.graphics.vector.ImageVector
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = 20.dp,
+                end = 20.dp,
+                top = 18.dp,
+                bottom = 8.dp
+            ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Surface(
+            color = color.copy(alpha = 0.12f),
+            shape = RoundedCornerShape(11.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier
+                    .padding(10.dp)
+                    .size(21.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.width(11.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                color = color,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 16.sp
+            )
+
+            Text(
+                text = subtitle,
+                color = TextSecondary,
+                fontSize = 10.sp
+            )
+        }
+
+        Surface(
+            color = color.copy(alpha = 0.12f),
+            shape = RoundedCornerShape(20.dp)
+        ) {
+            Text(
+                text = count.toString(),
+                modifier = Modifier.padding(
+                    horizontal = 11.dp,
+                    vertical = 6.dp
+                ),
+                color = color,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 12.sp
+            )
+        }
+    }
+}
+
+// =====================================================================
+// BUSINESS IDEA CARD
+// Keep this public API stable: ExploreScreen and BrowseIdeasScreen use it.
+// =====================================================================
 
 @Composable
 fun EnhancedBusinessIdeaCard(
@@ -690,42 +1379,58 @@ fun EnhancedBusinessIdeaCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.clickable { onCardClick() },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier = modifier.clickable {
+            onCardClick()
+        },
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = SurfaceCard
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        )
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Header Row: Sheng Title, Match Score & Bookmark
+        Column(
+            modifier = Modifier.padding(15.dp)
+        ) {
+
+            // -----------------------------------------------------
+            // CARD HEADER
+            // -----------------------------------------------------
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
+                    modifier = Modifier.weight(1f),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    FeasibilityBadge(group = idea.feasibilityGroup)
+                    FeasibilityBadge(
+                        group = idea.feasibilityGroup
+                    )
 
                     Surface(
-                        shape = RoundedCornerShape(6.dp),
-                        color = SciBluePrimary.copy(alpha = 0.08f)
+                        shape = RoundedCornerShape(7.dp),
+                        color = SciBlueContainer
                     ) {
                         Text(
                             text = idea.shengTitle,
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                color = SciBluePrimary,
-                                fontWeight = FontWeight.Bold
+                            modifier = Modifier.padding(
+                                horizontal = 8.dp,
+                                vertical = 5.dp
                             ),
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            color = SciBluePrimary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp
                         )
                     }
                 }
 
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
                         onClick = onToggleCompare,
@@ -734,7 +1439,12 @@ fun EnhancedBusinessIdeaCard(
                         Icon(
                             imageVector = Icons.Default.CompareArrows,
                             contentDescription = "Compare",
-                            tint = if (isCompared) KenyaGoldDark else TextMuted
+                            tint = if (isCompared) {
+                                SciRedAccent
+                            } else {
+                                TextMuted
+                            },
+                            modifier = Modifier.size(20.dp)
                         )
                     }
 
@@ -743,31 +1453,49 @@ fun EnhancedBusinessIdeaCard(
                         modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
-                            imageVector = if (isSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                            contentDescription = if (isSaved) "Remove from saved" else "Save idea",
-                            tint = if (isSaved) KenyaGoldDark else TextMuted
+                            imageVector = if (isSaved) {
+                                Icons.Filled.Bookmark
+                            } else {
+                                Icons.Outlined.BookmarkBorder
+                            },
+                            contentDescription = if (isSaved) {
+                                "Remove from saved"
+                            } else {
+                                "Save idea"
+                            },
+                            tint = if (isSaved) {
+                                SciRedAccent
+                            } else {
+                                TextMuted
+                            },
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            // Main Title
+            // -----------------------------------------------------
+            // TITLE AND MATCH SCORE
+            // -----------------------------------------------------
+
             Text(
                 text = idea.title,
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.ExtraBold,
                     color = TextPrimary
                 )
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
-            MatchScoreBadge(score = idea.matchScore)
+            Spacer(modifier = Modifier.height(7.dp))
 
-            Spacer(modifier = Modifier.height(6.dp))
+            MatchScoreBadge(
+                score = idea.matchScore
+            )
 
-            // Summary
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 text = idea.summary,
                 style = MaterialTheme.typography.bodyMedium.copy(
@@ -777,48 +1505,80 @@ fun EnhancedBusinessIdeaCard(
                 maxLines = 3
             )
 
-            // Explainability Section
+            // -----------------------------------------------------
+            // RECOMMENDATION EXPLANATION
+            // -----------------------------------------------------
+
             idea.explanation?.let { exp ->
-                Spacer(modifier = Modifier.height(10.dp))
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = SurfaceVariantWarm,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    color = SciBlueContainer.copy(alpha = 0.65f)
                 ) {
-                    Column(modifier = Modifier.padding(10.dp)) {
-                        Text(
-                            text = "💡 Why This Was Recommended For You:",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = SciBluePrimary
+                    Column(
+                        modifier = Modifier.padding(11.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.Lightbulb,
+                                contentDescription = null,
+                                tint = SciBluePrimary,
+                                modifier = Modifier.size(16.dp)
                             )
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        if (exp.matchedSkillNames.isNotEmpty()) {
+
+                            Spacer(modifier = Modifier.width(6.dp))
+
                             Text(
-                                text = "• Matching Skills: ${exp.matchedSkillNames.joinToString(", ")}",
-                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp)
+                                text = "WHY THIS MATCH?",
+                                color = SciBluePrimary,
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 10.sp,
+                                letterSpacing = 0.5.sp
                             )
                         }
-                        Text(
-                            text = "• Capital Analysis: ${exp.capitalStatusText}",
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp)
-                        )
-                        Text(
-                            text = "• Next Step: ${exp.recommendedNextStep}",
-                            style = MaterialTheme.typography.bodySmall.copy(
+
+                        Spacer(modifier = Modifier.height(7.dp))
+
+                        if (exp.matchedSkillNames.isNotEmpty()) {
+                            Text(
+                                text = "Matching skills: ${exp.matchedSkillNames.joinToString(", ")}",
+                                color = TextPrimary,
                                 fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = KenyaGreenDark
+                                lineHeight = 16.sp
                             )
+                        }
+
+                        Text(
+                            text = "Capital analysis: ${exp.capitalStatusText}",
+                            color = TextPrimary,
+                            fontSize = 11.sp,
+                            lineHeight = 16.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = "Next step: ${exp.recommendedNextStep}",
+                            color = KenyaGreenDark,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            lineHeight = 16.sp
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // Metrics Row: Capital & Monthly Profit
+            // -----------------------------------------------------
+            // FINANCIAL METRICS
+            // -----------------------------------------------------
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -832,15 +1592,18 @@ fun EnhancedBusinessIdeaCard(
 
                 KesTag(
                     amountText = "KSh ${"%,d".format(idea.estimatedMonthlyProfitKes.first)} - ${"%,d".format(idea.estimatedMonthlyProfitKes.last)}",
-                    label = "Monthly Net",
+                    label = "Estimated Monthly Net",
                     color = KenyaGreenPrimary,
                     modifier = Modifier.weight(1f)
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // Action Buttons
+            // -----------------------------------------------------
+            // ACTIONS
+            // -----------------------------------------------------
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -849,52 +1612,77 @@ fun EnhancedBusinessIdeaCard(
                 OutlinedButton(
                     onClick = onLoadIntoCalculator,
                     shape = RoundedCornerShape(10.dp),
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp)
+                    contentPadding = PaddingValues(
+                        horizontal = 8.dp,
+                        vertical = 7.dp
+                    ),
+                    modifier = Modifier.weight(1f)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Calculate,
-                        contentDescription = "Calc",
+                        Icons.Default.Calculate,
+                        contentDescription = null,
                         modifier = Modifier.size(15.dp)
                     )
+
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "Calculator", fontSize = 11.sp)
+
+                    Text(
+                        "Calculator",
+                        fontSize = 10.sp
+                    )
                 }
 
                 OutlinedButton(
                     onClick = onStartJourney,
                     shape = RoundedCornerShape(10.dp),
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp)
+                    contentPadding = PaddingValues(
+                        horizontal = 7.dp,
+                        vertical = 7.dp
+                    ),
+                    modifier = Modifier.weight(1.15f)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Checklist,
-                        contentDescription = "Journey",
-                        modifier = Modifier.size(15.dp),
-                        tint = KenyaGreenPrimary
+                        Icons.Default.Checklist,
+                        contentDescription = null,
+                        tint = KenyaGreenPrimary,
+                        modifier = Modifier.size(15.dp)
                     )
+
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "6-Stage Plan", fontSize = 11.sp, color = KenyaGreenPrimary)
+
+                    Text(
+                        "6-Stage Plan",
+                        color = KenyaGreenPrimary,
+                        fontSize = 10.sp
+                    )
                 }
 
                 Button(
-                    onClick = onCardClick,
+                    onClick = onBuildBusinessPlan,
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = SciBluePrimary),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = SciRedAccent
+                    ),
+                    contentPadding = PaddingValues(
+                        horizontal = 8.dp,
+                        vertical = 7.dp
+                    ),
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = "Blueprint",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
+                        "Blueprint",
+                        color = Color.White,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold
                     )
-                    Spacer(modifier = Modifier.width(2.dp))
+
+                    Spacer(modifier = Modifier.width(3.dp))
+
                     Icon(
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = "Open",
-                        modifier = Modifier.size(14.dp),
-                        tint = Color.White
+                        Icons.Default.ArrowForward,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(13.dp)
                     )
                 }
             }

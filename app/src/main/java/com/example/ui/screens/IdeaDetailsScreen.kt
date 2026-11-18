@@ -1,7 +1,8 @@
 package com.example.ui.screens
 
 import android.content.Intent
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,7 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.model.BusinessIdea
 import com.example.ui.components.*
+import com.example.ui.theme.*
 
 @Composable
 fun IdeaDetailsScreen(
@@ -39,450 +41,845 @@ fun IdeaDetailsScreen(
     onStartJourney: (BusinessIdea) -> Unit
 ) {
     val context = LocalContext.current
+
     var isRequirementsExpanded by remember { mutableStateOf(false) }
     var isCustomersExpanded by remember { mutableStateOf(false) }
     var isMarketingExpanded by remember { mutableStateOf(false) }
     var isNextStepsExpanded by remember { mutableStateOf(false) }
 
+    val formattedCapitalMin = remember(idea.capitalMinKes) {
+        "%,d".format(idea.capitalMinKes)
+    }
+    val formattedCapitalMax = remember(idea.capitalMaxKes) {
+        "%,d".format(idea.capitalMaxKes)
+    }
+    val formattedProfitMin = remember(idea.estimatedMonthlyProfitKes) {
+        "%,d".format(idea.estimatedMonthlyProfitKes.first)
+    }
+    val formattedProfitMax = remember(idea.estimatedMonthlyProfitKes) {
+        "%,d".format(idea.estimatedMonthlyProfitKes.last)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(SurfaceCream)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(bottom = 90.dp)
+                .padding(bottom = 104.dp)
         ) {
-            // Hero Image Header with Overlaid Action Icons
+            // ---------------------------------------------------------
+            // HERO
+            // ---------------------------------------------------------
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(230.dp)
+                    .height(250.dp)
             ) {
                 IdeaCardThumbnail(
                     type = idea.thumbnailType,
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // Dark gradient overlay for readable controls
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
                             Brush.verticalGradient(
-                                colors = listOf(Color.Black.copy(alpha = 0.5f), Color.Transparent, Color.Black.copy(alpha = 0.4f))
+                                colors = listOf(
+                                    Color.Black.copy(alpha = 0.62f),
+                                    Color.Transparent,
+                                    SciBlueDark.copy(alpha = 0.65f)
+                                )
                             )
                         )
                 )
 
-                // Top Controls: Back arrow, Share, Bookmark
-                Row(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 36.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxSize()
+                        .padding(horizontal = 20.dp, vertical = 34.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    IconButton(
-                        onClick = onBack,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.85f))
-                            .testTag("details_back_button")
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color(0xFF111827)
+                        HeroActionButton(
+                            icon = Icons.Default.ArrowBack,
+                            description = "Back",
+                            testTag = "details_back_button",
+                            onClick = onBack
                         )
-                    }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        IconButton(
-                            onClick = {
-                                val shareIntent = Intent().apply {
-                                    action = Intent.ACTION_SEND
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            HeroActionButton(
+                                icon = Icons.Default.Share,
+                                description = "Share idea",
+                                testTag = "details_share_button"
+                            ) {
+                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
                                     putExtra(
                                         Intent.EXTRA_TEXT,
-                                        "Check out this Kenyan youth business idea on BiasharaHub KE: ${idea.title}!\nEst. Investment: KSh ${idea.capitalMinKes} - ${idea.capitalMaxKes}"
+                                        "Check out this Kenyan youth business idea on BiasharaHub KE: " +
+                                            "${idea.title}!\n" +
+                                            "Estimated investment: KSh $formattedCapitalMin - KSh $formattedCapitalMax"
                                     )
-                                    type = "text/plain"
                                 }
-                                context.startActivity(Intent.createChooser(shareIntent, "Share Idea"))
-                            },
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(Color.White.copy(alpha = 0.85f))
-                                .testTag("details_share_button")
+
+                                context.startActivity(
+                                    Intent.createChooser(shareIntent, "Share business idea")
+                                )
+                            }
+
+                            HeroActionButton(
+                                icon = if (isSaved) {
+                                    Icons.Default.Bookmark
+                                } else {
+                                    Icons.Outlined.BookmarkBorder
+                                },
+                                description = if (isSaved) "Remove bookmark" else "Save bookmark",
+                                testTag = "details_bookmark_button",
+                                tint = if (isSaved) SciRedAccent else TextPrimary,
+                                onClick = onToggleSave
+                            )
+                        }
+                    }
+
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Surface(
+                            color = SciRedAccent,
+                            shape = RoundedCornerShape(6.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Share,
-                                contentDescription = "Share",
-                                tint = Color(0xFF111827),
-                                modifier = Modifier.size(20.dp)
+                            Text(
+                                text = "BUSINESS IDEA",
+                                modifier = Modifier.padding(
+                                    horizontal = 10.dp,
+                                    vertical = 5.dp
+                                ),
+                                color = Color.White,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                letterSpacing = 1.sp
                             )
                         }
 
-                        IconButton(
-                            onClick = onToggleSave,
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(Color.White.copy(alpha = 0.85f))
-                                .testTag("details_bookmark_button")
-                        ) {
-                            Icon(
-                                imageVector = if (isSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                                contentDescription = "Bookmark",
-                                tint = if (isSaved) KenyanGreen else Color(0xFF111827),
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
+                        Text(
+                            text = idea.title,
+                            color = Color.White,
+                            fontSize = 25.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            lineHeight = 31.sp
+                        )
                     }
                 }
             }
 
-            // Body Content
+            // ---------------------------------------------------------
+            // MAIN CONTENT
+            // ---------------------------------------------------------
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp)
+                    .padding(horizontal = 18.dp)
             ) {
-                // Title
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // Category and capital tier
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    DetailTag(
+                        text = idea.category.displayName,
+                        background = SciRedContainer,
+                        foreground = SciRedDark
+                    )
+
+                    DetailTag(
+                        text = idea.capitalTier.label,
+                        background = SciBlueContainer,
+                        foreground = SciBluePrimary
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // Financial summary
                 Text(
-                    text = idea.title,
-                    fontSize = 22.sp,
+                    text = "Financial overview",
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF111827)
+                    color = TextPrimary
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-                // Tags: Agriculture (green pill), Low Capital (blue pill)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(
-                        shape = RoundedCornerShape(6.dp),
-                        color = Color(0xFFE8F5E9)
-                    ) {
-                        Text(
-                            text = idea.category.displayName,
-                            color = KenyanGreen,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Surface(
-                        shape = RoundedCornerShape(6.dp),
-                        color = Color(0xFFE0F2FE)
-                    ) {
-                        Text(
-                            text = idea.capitalTier.label,
-                            color = Color(0xFF0369A1),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // 2-Column Metrics Box (Estimated Investment & Potential Monthly Profit)
                 Surface(
-                    shape = RoundedCornerShape(14.dp),
-                    color = Color(0xFFF9FAFB),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE5E7EB)),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(18.dp),
+                    color = Color.White,
+                    border = BorderStroke(1.dp, SurfaceBorder)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Estimated Investment",
-                                fontSize = 11.sp,
-                                color = Color(0xFF6B7280),
-                                fontWeight = FontWeight.Medium
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            FinancialMetric(
+                                title = "ESTIMATED INVESTMENT",
+                                amount = "KSh $formattedCapitalMin",
+                                rangeEnd = "KSh $formattedCapitalMax",
+                                icon = Icons.Default.AccountBalanceWallet,
+                                accent = SciBluePrimary,
+                                modifier = Modifier.weight(1f)
                             )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "KSh ${String.format("%,d", idea.capitalMinKes)} - ${String.format("%,d", idea.capitalMaxKes)}",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF111827)
+
+                            Box(
+                                modifier = Modifier
+                                    .width(1.dp)
+                                    .height(72.dp)
+                                    .background(SurfaceBorder)
+                            )
+
+                            FinancialMetric(
+                                title = "POTENTIAL MONTHLY PROFIT",
+                                amount = "KSh $formattedProfitMin",
+                                rangeEnd = "KSh $formattedProfitMax",
+                                icon = Icons.Default.TrendingUp,
+                                accent = KenyaGreenPrimary,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 14.dp)
                             )
                         }
 
-                        Divider(
-                            modifier = Modifier
-                                .height(40.dp)
-                                .width(1.dp),
-                            color = Color(0xFFE5E7EB)
-                        )
+                        Spacer(modifier = Modifier.height(14.dp))
 
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 12.dp)
+                        HorizontalDivider(color = SurfaceBorder)
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "Potential Monthly Profit",
-                                fontSize = 11.sp,
-                                color = Color(0xFF6B7280),
-                                fontWeight = FontWeight.Medium
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = null,
+                                tint = TextSecondary,
+                                modifier = Modifier.size(16.dp)
                             )
-                            Spacer(modifier = Modifier.height(4.dp))
+
+                            Spacer(modifier = Modifier.width(7.dp))
+
                             Text(
-                                text = "KSh ${String.format("%,d", idea.estimatedMonthlyProfitKes.first)} - ${String.format("%,d", idea.estimatedMonthlyProfitKes.last)}",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = KenyanGreen
+                                text = "Figures are estimates. Actual costs and returns depend on your market and execution.",
+                                color = TextSecondary,
+                                fontSize = 11.sp,
+                                lineHeight = 16.sp
                             )
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // Rating
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Rating",
+                        tint = KenyaGold,
+                        modifier = Modifier.size(19.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Text(
+                        text = idea.rating.toString(),
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary,
+                        fontSize = 14.sp
+                    )
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Text(
+                        text = "(${idea.reviewCount}+ reviews)",
+                        color = TextSecondary,
+                        fontSize = 13.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(22.dp))
+
+                // Overview
+                SectionHeader(
+                    title = "Business overview",
+                    subtitle = "Understand the opportunity"
+                )
+
+                Spacer(modifier = Modifier.height(9.dp))
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(15.dp),
+                    color = Color.White,
+                    border = BorderStroke(1.dp, SurfaceBorder)
+                ) {
+                    Text(
+                        text = idea.summary,
+                        modifier = Modifier.padding(16.dp),
+                        color = TextSecondary,
+                        fontSize = 14.sp,
+                        lineHeight = 22.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // -----------------------------------------------------
+                // EXPANDABLE DETAILS
+                // -----------------------------------------------------
+
+                SectionHeader(
+                    title = "Explore the details",
+                    subtitle = "Everything you need to prepare for launch"
+                )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Star Rating Row
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = null,
-                        tint = KenyanGold,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${idea.rating} ",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF111827)
-                    )
-                    Text(
-                        text = "(${idea.reviewCount}+ reviews)",
-                        fontSize = 13.sp,
-                        color = Color(0xFF6B7280)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Overview Section
-                Text(
-                    text = "Overview",
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF111827)
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = idea.summary,
-                    fontSize = 14.sp,
-                    color = Color(0xFF4B5563),
-                    lineHeight = 21.sp
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // 4 Expandable Accordion Sections
                 AccordionItem(
-                    title = "Startup Requirements",
+                    title = "Startup requirements",
                     icon = Icons.Default.Inventory2,
                     isExpanded = isRequirementsExpanded,
-                    onToggle = { isRequirementsExpanded = !isRequirementsExpanded },
+                    onToggle = {
+                        isRequirementsExpanded = !isRequirementsExpanded
+                    },
                     testTag = "acc_startup_requirements"
                 ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = "Capital Breakdown:",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp,
-                            color = Color(0xFF374151)
-                        )
-                        idea.capitalBreakdown.forEach { (item, cost) ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text("• $item", fontSize = 13.sp, color = Color(0xFF4B5563), modifier = Modifier.weight(1f))
-                                Text("KSh ${String.format("%,d", cost)}", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = KenyanGreen)
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "Required Equipment:",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp,
-                            color = Color(0xFF374151)
-                        )
-                        idea.equipmentNeeded.forEach { eq ->
-                            Text("✓ $eq", fontSize = 13.sp, color = Color(0xFF4B5563))
-                        }
-                    }
-                }
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        DetailSubheading("Capital breakdown")
 
-                Spacer(modifier = Modifier.height(10.dp))
-
-                AccordionItem(
-                    title = "Potential Customers",
-                    icon = Icons.Default.People,
-                    isExpanded = isCustomersExpanded,
-                    onToggle = { isCustomersExpanded = !isCustomersExpanded },
-                    testTag = "acc_potential_customers"
-                ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        idea.targetCustomers.forEach { customer ->
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.CheckCircle,
-                                    contentDescription = null,
-                                    tint = KenyanGreen,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(customer, fontSize = 13.sp, color = Color(0xFF374151))
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                AccordionItem(
-                    title = "Marketing Strategies",
-                    icon = Icons.Default.Campaign,
-                    isExpanded = isMarketingExpanded,
-                    onToggle = { isMarketingExpanded = !isMarketingExpanded },
-                    testTag = "acc_marketing_strategies"
-                ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(idea.marketingStrategy, fontSize = 13.sp, color = Color(0xFF4B5563), lineHeight = 19.sp)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text("M-PESA Edge:", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = KenyanGreen)
-                        Text(idea.mpesaTip, fontSize = 12.sp, color = Color(0xFF374151))
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                AccordionItem(
-                    title = "Next Steps",
-                    icon = Icons.Default.Navigation,
-                    isExpanded = isNextStepsExpanded,
-                    onToggle = { isNextStepsExpanded = !isNextStepsExpanded },
-                    testTag = "acc_next_steps"
-                ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        idea.launchSteps.forEachIndexed { index, step ->
-                            Row(verticalAlignment = Alignment.Top) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(20.dp)
-                                        .clip(CircleShape)
-                                        .background(KenyanGreen),
-                                    contentAlignment = Alignment.Center
+                        if (idea.capitalBreakdown.isEmpty()) {
+                            DetailEmptyText("No capital breakdown has been provided yet.")
+                        } else {
+                            idea.capitalBreakdown.forEach { (item, cost) ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = "${index + 1}",
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.White
+                                        text = item,
+                                        modifier = Modifier.weight(1f),
+                                        color = TextSecondary,
+                                        fontSize = 13.sp
+                                    )
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    Text(
+                                        text = "KSh ${"%,d".format(cost)}",
+                                        color = TextPrimary,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold
                                     )
                                 }
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(step, fontSize = 13.sp, color = Color(0xFF374151), lineHeight = 18.sp)
+                            }
+                        }
+
+                        HorizontalDivider(color = SurfaceBorder)
+
+                        DetailSubheading("Required equipment")
+
+                        if (idea.equipmentNeeded.isEmpty()) {
+                            DetailEmptyText("No specific equipment listed.")
+                        } else {
+                            idea.equipmentNeeded.forEach { equipment ->
+                                DetailBulletRow(
+                                    text = equipment,
+                                    icon = Icons.Default.CheckCircle
+                                )
                             }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-                // Tools: Calculator & Plan Buttons
+                AccordionItem(
+                    title = "Potential customers",
+                    icon = Icons.Default.People,
+                    isExpanded = isCustomersExpanded,
+                    onToggle = {
+                        isCustomersExpanded = !isCustomersExpanded
+                    },
+                    testTag = "acc_potential_customers"
+                ) {
+                    if (idea.targetCustomers.isEmpty()) {
+                        DetailEmptyText("Customer information is not available yet.")
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            idea.targetCustomers.forEach { customer ->
+                                DetailBulletRow(
+                                    text = customer,
+                                    icon = Icons.Default.PersonOutline
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                AccordionItem(
+                    title = "Marketing strategies",
+                    icon = Icons.Default.Campaign,
+                    isExpanded = isMarketingExpanded,
+                    onToggle = {
+                        isMarketingExpanded = !isMarketingExpanded
+                    },
+                    testTag = "acc_marketing_strategies"
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text(
+                            text = idea.marketingStrategy,
+                            color = TextSecondary,
+                            fontSize = 13.sp,
+                            lineHeight = 20.sp
+                        )
+
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = SciBlueContainer
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(13.dp),
+                                verticalArrangement = Arrangement.spacedBy(5.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.AccountBalanceWallet,
+                                        contentDescription = null,
+                                        tint = SciBluePrimary,
+                                        modifier = Modifier.size(17.dp)
+                                    )
+
+                                    Spacer(modifier = Modifier.width(7.dp))
+
+                                    Text(
+                                        text = "M-PESA advantage",
+                                        color = SciBluePrimary,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp
+                                    )
+                                }
+
+                                Text(
+                                    text = idea.mpesaTip,
+                                    color = TextPrimary,
+                                    fontSize = 12.sp,
+                                    lineHeight = 18.sp
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                AccordionItem(
+                    title = "Next steps",
+                    icon = Icons.Default.Navigation,
+                    isExpanded = isNextStepsExpanded,
+                    onToggle = {
+                        isNextStepsExpanded = !isNextStepsExpanded
+                    },
+                    testTag = "acc_next_steps"
+                ) {
+                    if (idea.launchSteps.isEmpty()) {
+                        DetailEmptyText("Launch steps are not available yet.")
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                            idea.launchSteps.forEachIndexed { index, step ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(27.dp)
+                                            .clip(CircleShape)
+                                            .background(SciRedContainer),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "${index + 1}",
+                                            color = SciRedDark,
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.width(11.dp))
+
+                                    Text(
+                                        text = step,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(top = 3.dp),
+                                        color = TextSecondary,
+                                        fontSize = 13.sp,
+                                        lineHeight = 19.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // -----------------------------------------------------
+                // BUSINESS TOOLS
+                // -----------------------------------------------------
+
+                SectionHeader(
+                    title = "Put your idea into action",
+                    subtitle = "Use these tools to plan your next move"
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    OutlinedButton(
+                    Button(
                         onClick = { onOpenCalculator(idea) },
-                        modifier = Modifier.weight(1f).testTag("details_calculator_button"),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = KenyanGreen)
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp)
+                            .testTag("details_calculator_button"),
+                        shape = RoundedCornerShape(13.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = SciRedAccent
+                        ),
+                        contentPadding = PaddingValues(horizontal = 8.dp)
                     ) {
-                        Icon(imageVector = Icons.Default.Calculate, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(
+                            imageVector = Icons.Default.Calculate,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Calculator", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+
+                        Text(
+                            text = "Calculator",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
 
                     OutlinedButton(
                         onClick = { onOpenBusinessPlan(idea) },
-                        modifier = Modifier.weight(1f).testTag("details_plan_button"),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF0F268C))
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp)
+                            .testTag("details_plan_button"),
+                        shape = RoundedCornerShape(13.dp),
+                        border = BorderStroke(1.dp, SciBluePrimary),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = SciBluePrimary
+                        ),
+                        contentPadding = PaddingValues(horizontal = 8.dp)
                     ) {
-                        Icon(imageVector = Icons.Default.Description, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(
+                            imageVector = Icons.Default.Description,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Plan Draft", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+
+                        Text(
+                            text = "Plan draft",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Start a guided journey
+                OutlinedButton(
+                    onClick = { onStartJourney(idea) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(13.dp),
+                    border = BorderStroke(1.dp, SciRedAccent),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = SciRedAccent
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Flag,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = "Start business journey",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
             }
         }
 
-        // Bottom Sticky Action Button: "Save Idea" / "Saved"
+        // -------------------------------------------------------------
+        // STICKY SAVE ACTION
+        // -------------------------------------------------------------
+
         Surface(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(),
             color = Color.White,
-            shadowElevation = 8.dp
+            shadowElevation = 12.dp
         ) {
-            Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 18.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        text = if (isSaved) "In your collection" else "Keep this idea",
+                        color = TextPrimary,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = if (isSaved) {
+                            "You can find it in My Ideas."
+                        } else {
+                            "Save it for later."
+                        },
+                        color = TextSecondary,
+                        fontSize = 11.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
                 Button(
                     onClick = onToggleSave,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
+                        .height(49.dp)
+                        .widthIn(min = 142.dp)
                         .testTag("details_sticky_save_button"),
+                    shape = RoundedCornerShape(13.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isSaved) Color(0xFF0A512D) else KenyanGreen
-                    ),
-                    shape = RoundedCornerShape(26.dp)
+                        containerColor = if (isSaved) {
+                            SciBluePrimary
+                        } else {
+                            SciRedAccent
+                        }
+                    )
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = if (isSaved) Icons.Default.BookmarkAdded else Icons.Default.BookmarkAdd,
-                            contentDescription = null,
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = if (isSaved) "Saved to My Ideas" else "Save Idea",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
+                    Icon(
+                        imageVector = if (isSaved) {
+                            Icons.Default.BookmarkAdded
+                        } else {
+                            Icons.Default.BookmarkAdd
+                        },
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(7.dp))
+
+                    Text(
+                        text = if (isSaved) "Saved" else "Save idea",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
                 }
             }
         }
     }
 }
 
+// =====================================================================
+// REUSABLE COMPONENTS
+// =====================================================================
+
+@Composable
+private fun HeroActionButton(
+    icon: ImageVector,
+    description: String,
+    testTag: String,
+    tint: Color = TextPrimary,
+    onClick: () -> Unit
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier
+            .size(42.dp)
+            .clip(CircleShape)
+            .background(Color.White.copy(alpha = 0.94f))
+            .testTag(testTag)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = description,
+            tint = tint,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+@Composable
+private fun DetailTag(
+    text: String,
+    background: Color,
+    foreground: Color
+) {
+    Surface(
+        color = background,
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(
+                horizontal = 11.dp,
+                vertical = 6.dp
+            ),
+            color = foreground,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+private fun FinancialMetric(
+    title: String,
+    amount: String,
+    rangeEnd: String,
+    icon: ImageVector,
+    accent: Color,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = accent,
+            modifier = Modifier.size(20.dp)
+        )
+
+        Text(
+            text = title,
+            color = TextSecondary,
+            fontSize = 9.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 0.4.sp,
+            lineHeight = 13.sp
+        )
+
+        Text(
+            text = amount,
+            color = TextPrimary,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+
+        Text(
+            text = "to $rangeEnd",
+            color = TextSecondary,
+            fontSize = 11.sp
+        )
+    }
+}
+
+@Composable
+private fun DetailSubheading(text: String) {
+    Text(
+        text = text,
+        color = TextPrimary,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.Bold
+    )
+}
+
+@Composable
+private fun DetailEmptyText(text: String) {
+    Text(
+        text = text,
+        color = TextSecondary,
+        fontSize = 12.sp,
+        lineHeight = 18.sp
+    )
+}
+
+@Composable
+private fun DetailBulletRow(
+    text: String,
+    icon: ImageVector
+) {
+    Row(
+        verticalAlignment = Alignment.Top
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = KenyaGreenPrimary,
+            modifier = Modifier
+                .size(17.dp)
+                .padding(top = 1.dp)
+        )
+
+        Spacer(modifier = Modifier.width(9.dp))
+
+        Text(
+            text = text,
+            modifier = Modifier.weight(1f),
+            color = TextSecondary,
+            fontSize = 13.sp,
+            lineHeight = 19.sp
+        )
+    }
+}
+
+// Kept public to preserve compatibility with other screens.
 @Composable
 fun AccordionItem(
     title: String,
@@ -496,39 +893,52 @@ fun AccordionItem(
         modifier = Modifier
             .fillMaxWidth()
             .testTag(testTag),
-        shape = RoundedCornerShape(12.dp),
-        color = Color(0xFFF9FAFB),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE5E7EB))
+        shape = RoundedCornerShape(15.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, SurfaceBorder)
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onToggle() }
-                    .padding(horizontal = 14.dp, vertical = 14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .clickable(onClick = onToggle)
+                    .padding(horizontal = 15.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(37.dp)
+                        .clip(RoundedCornerShape(11.dp))
+                        .background(SciRedContainer),
+                    contentAlignment = Alignment.Center
+                ) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = KenyanGreen,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = title,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF1F2937)
+                        tint = SciRedDark,
+                        modifier = Modifier.size(19.dp)
                     )
                 }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Text(
+                    text = title,
+                    modifier = Modifier.weight(1f),
+                    color = TextPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+
                 Icon(
-                    imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ChevronRight,
-                    contentDescription = null,
-                    tint = Color(0xFF6B7280),
-                    modifier = Modifier.size(20.dp)
+                    imageVector = if (isExpanded) {
+                        Icons.Default.ExpandLess
+                    } else {
+                        Icons.Default.ExpandMore
+                    },
+                    contentDescription = if (isExpanded) "Collapse" else "Expand",
+                    tint = TextSecondary,
+                    modifier = Modifier.size(22.dp)
                 )
             }
 
@@ -536,9 +946,18 @@ fun AccordionItem(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 4.dp)
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 2.dp,
+                            bottom = 17.dp
+                        )
                 ) {
-                    Divider(color = Color(0xFFE5E7EB), modifier = Modifier.padding(bottom = 12.dp))
+                    HorizontalDivider(
+                        color = SurfaceBorder,
+                        modifier = Modifier.padding(bottom = 14.dp)
+                    )
+
                     content()
                 }
             }

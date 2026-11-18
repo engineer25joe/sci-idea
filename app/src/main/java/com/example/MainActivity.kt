@@ -50,6 +50,12 @@ private enum class AppEntryState {
     MAIN
 }
 
+private enum class SecondaryScreen {
+    MATCHER,
+    TRENDS,
+    STORIES
+}
+
 class MainActivity : ComponentActivity() {
 
     private val viewModel: BiasharaViewModel by viewModels()
@@ -83,6 +89,21 @@ class MainActivity : ComponentActivity() {
                 }
 
                 var currentScreen by remember {
+                    mutableStateOf(Screen.HOME)
+                }
+
+                // Secondary screens remain outside the four bottom navigation tabs.
+                var secondaryScreen by remember {
+                    mutableStateOf<SecondaryScreen?>(null)
+                }
+
+                // The secondary screen to return to when Android Back is pressed.
+                var secondaryParent by remember {
+                    mutableStateOf<SecondaryScreen?>(null)
+                }
+
+                // The original main tab from which secondary navigation started.
+                var secondaryReturnScreen by remember {
                     mutableStateOf(Screen.HOME)
                 }
 
@@ -190,6 +211,10 @@ class MainActivity : ComponentActivity() {
                     isSearching = false
                     showCalculatorScreen = false
 
+                    secondaryScreen = null
+                    secondaryParent = null
+                    secondaryReturnScreen = Screen.HOME
+
                     entryState =
                         if (uiState.isOnboardingCompleted) {
                             AppEntryState.MAIN
@@ -213,6 +238,10 @@ class MainActivity : ComponentActivity() {
                         currentScreen = Screen.HOME
                         isSearching = false
                         showCalculatorScreen = false
+
+                        secondaryScreen = null
+                        secondaryParent = null
+                        secondaryReturnScreen = Screen.HOME
 
                         entryState = AppEntryState.AUTHENTICATION
                     }
@@ -376,6 +405,7 @@ class MainActivity : ComponentActivity() {
                                 isSearching ||
                                 uiState.selectedDetailIdea != null ||
                                 showCalculatorScreen ||
+                                secondaryScreen != null ||
                                 uiState.showAboutDialog ||
                                 uiState.showCompareSheet ||
                                 uiState.showJourneySheet ||
@@ -408,6 +438,17 @@ class MainActivity : ComponentActivity() {
 
                                     uiState.showPlanDraftSheet ->
                                         viewModel.closeBusinessPlanDraft()
+
+                                    secondaryParent != null -> {
+                                        secondaryScreen = secondaryParent
+                                        secondaryParent = null
+                                    }
+
+                                    secondaryScreen != null -> {
+                                        secondaryScreen = null
+                                        secondaryParent = null
+                                        currentScreen = secondaryReturnScreen
+                                    }
 
                                     currentScreen != Screen.HOME ->
                                         currentScreen = Screen.HOME
@@ -445,6 +486,10 @@ class MainActivity : ComponentActivity() {
                                                 onClick = {
 
                                                     isSearching = false
+
+                                                    secondaryScreen = null
+                                                    secondaryParent = null
+
                                                     currentScreen = screen
                                                 },
 
@@ -534,8 +579,50 @@ class MainActivity : ComponentActivity() {
                                             viewModel = viewModel
                                         )
 
-                                    } else {
+                                    } else if (secondaryScreen != null) {
 
+                                        when (secondaryScreen) {
+
+                                            SecondaryScreen.MATCHER -> {
+
+                                                MatcherScreen(
+                                                    uiState = uiState,
+                                                    viewModel = viewModel,
+
+                                                    onNavigateToTrends = {
+
+                                                        secondaryParent = SecondaryScreen.MATCHER
+                                                        secondaryScreen = SecondaryScreen.TRENDS
+                                                    },
+
+                                                    onNavigateToStories = {
+
+                                                        secondaryParent = SecondaryScreen.MATCHER
+                                                        secondaryScreen = SecondaryScreen.STORIES
+                                                    }
+                                                )
+                                            }
+
+                                            SecondaryScreen.TRENDS -> {
+
+                                                TrendsScreen(
+                                                    uiState = uiState,
+                                                    viewModel = viewModel
+                                                )
+                                            }
+
+                                            SecondaryScreen.STORIES -> {
+
+                                                SuccessStoriesScreen(
+                                                    uiState = uiState,
+                                                    viewModel = viewModel
+                                                )
+                                            }
+
+                                            null -> Unit
+                                        }
+
+                                    } else {
                                         AnimatedContent(
                                             targetState = currentScreen,
 
@@ -565,6 +652,13 @@ class MainActivity : ComponentActivity() {
                                                             isSearching = true
                                                         },
 
+                                                        onNavigateToMatcher = {
+
+                                                            secondaryReturnScreen = Screen.HOME
+                                                            secondaryParent = null
+                                                            secondaryScreen = SecondaryScreen.MATCHER
+                                                        },
+
                                                         onSelectIdea = { idea ->
                                                             viewModel.selectDetailIdea(idea)
                                                         }
@@ -579,6 +673,10 @@ class MainActivity : ComponentActivity() {
 
                                                         initialCategory =
                                                             selectedCategoryFilter,
+
+                                                        onCategoryChanged = { category ->
+                                                            selectedCategoryFilter = category
+                                                        },
 
                                                         onBack = {
                                                             currentScreen = Screen.HOME
@@ -628,7 +726,10 @@ class MainActivity : ComponentActivity() {
                                                         },
 
                                                         onNavigateToStories = {
-                                                            currentScreen = Screen.EXPLORE
+
+                                                            secondaryReturnScreen = Screen.PROFILE
+                                                            secondaryParent = null
+                                                            secondaryScreen = SecondaryScreen.STORIES
                                                         }
                                                     )
                                                 }

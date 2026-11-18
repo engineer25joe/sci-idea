@@ -12,38 +12,70 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF6B82FA),
-    onPrimary = Color.White,
-    primaryContainer = SciBlueDark,
+    primary = DarkPrimary,
+    onPrimary = Color(0xFF3D0000),
+
+    primaryContainer = SciRedDark,
     onPrimaryContainer = Color.White,
-    secondary = KenyaGold,
-    onSecondary = Color.Black,
-    tertiary = SciRedLight,
+
+    secondary = DarkSecondary,
+    onSecondary = SciBlueDark,
+
+    secondaryContainer = SciBlueDark,
+    onSecondaryContainer = Color(0xFFE8ECFF),
+
+    tertiary = KenyaGold,
+    onTertiary = Color(0xFF241700),
+
     background = DarkBackground,
+    onBackground = DarkTextPrimary,
+
     surface = DarkSurface,
+    onSurface = DarkTextPrimary,
+
     surfaceVariant = DarkSurfaceVariant,
-    onBackground = Color(0xFFF1F5F9),
-    onSurface = Color(0xFFF1F5F9),
-    onSurfaceVariant = Color(0xFFCBD5E1)
+    onSurfaceVariant = DarkTextSecondary,
+
+    error = SciRedLight,
+    onError = Color.White,
+
+    errorContainer = StatusErrorRed,
+    onErrorContainer = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = SciBluePrimary,
+    // SCI Red is the primary action colour
+    primary = SciRedAccent,
     onPrimary = Color.White,
-    primaryContainer = SciBlueContainer,
-    onPrimaryContainer = OnSciBlueContainer,
-    secondary = KenyaGreenPrimary,
+
+    primaryContainer = SciRedContainer,
+    onPrimaryContainer = OnSciRedContainer,
+
+    // SCI Navy is the secondary brand colour
+    secondary = SciBluePrimary,
     onSecondary = Color.White,
-    secondaryContainer = KenyaGreenContainer,
-    onSecondaryContainer = OnKenyaGreenContainer,
-    tertiary = SciRedAccent,
+
+    secondaryContainer = SciBlueContainer,
+    onSecondaryContainer = OnSciBlueContainer,
+
+    // Gold is reserved for highlights
+    tertiary = KenyaGoldDark,
     onTertiary = Color.White,
+
     background = SurfaceCream,
-    surface = SurfaceCard,
-    surfaceVariant = SurfaceVariantWarm,
     onBackground = TextPrimary,
+
+    surface = SurfaceCard,
     onSurface = TextPrimary,
-    onSurfaceVariant = TextSecondary
+
+    surfaceVariant = SurfaceVariantWarm,
+    onSurfaceVariant = TextSecondary,
+
+    error = StatusErrorRed,
+    onError = Color.White,
+
+    errorContainer = StatusErrorContainer,
+    onErrorContainer = OnSciRedContainer
 )
 
 @Composable
@@ -55,9 +87,16 @@ fun BiasharaTheme(
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+
+            if (darkTheme) {
+                dynamicDarkColorScheme(context)
+            } else {
+                dynamicLightColorScheme(context)
+            }
         }
+
         darkTheme -> DarkColorScheme
+
         else -> LightColorScheme
     }
 
