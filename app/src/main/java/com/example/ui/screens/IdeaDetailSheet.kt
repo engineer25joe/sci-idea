@@ -425,12 +425,16 @@ fun IdeaDetailSheet(
                 Column(
                     modifier = Modifier.padding(15.dp)
                 ) {
-                    if (idea.capitalBreakdown.isEmpty()) {
+                    val capitalBreakdownEntries = idea.capitalBreakdown.entries.toList()
+
+                    if (capitalBreakdownEntries.isEmpty()) {
                         SheetEmptyMessage(
                             "Capital breakdown information is not available yet."
                         )
                     } else {
-                        idea.capitalBreakdown.forEachIndexed { index, (item, cost) ->
+                        capitalBreakdownEntries.forEachIndexed { index, entry ->
+                            val item = entry.key
+                            val cost = entry.value
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -476,7 +480,7 @@ fun IdeaDetailSheet(
                                 )
                             }
 
-                            if (index != idea.capitalBreakdown.lastIndex) {
+                            if (index != capitalBreakdownEntries.lastIndex) {
                                 HorizontalDivider(color = SurfaceBorder)
                             }
                         }

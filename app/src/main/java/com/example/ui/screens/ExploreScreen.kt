@@ -53,6 +53,8 @@ fun ExploreScreen(
         sortBy,
         uiState.allIdeas
     ) {
+        val tierFilter = selectedTierFilter
+
         val filtered = uiState.allIdeas.filter { idea ->
 
             val matchesQuery = searchQuery.isBlank() ||
@@ -68,9 +70,9 @@ fun ExploreScreen(
                         idea.category == uiState.categoryFilter
 
             val matchesTier =
-                selectedTierFilter == null ||
-                        idea.capitalTier == selectedTierFilter ||
-                        idea.capitalMaxKes <= selectedTierFilter.maxKes
+                tierFilter == null ||
+                        idea.capitalTier == tierFilter ||
+                        idea.capitalMaxKes <= tierFilter.maxKes
 
             val matchesModel =
                 selectedModelFilter == null ||
