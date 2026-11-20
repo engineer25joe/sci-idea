@@ -1,22 +1,50 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# SCI IDEA – BiasharaHub KE
 
-# Run and deploy your AI Studio app
+### Discover Business Opportunities. Build Your Future.
 
-This contains everything you need to run your app locally.
+**SCI IDEA** is an Android-based business idea discovery and entrepreneurship support platform designed to help young people and aspiring entrepreneurs identify business opportunities that match their interests, skills, available capital, and resources.
 
-View your app in AI Studio: https://ai.studio/apps/cecf15c2-299b-4da4-833a-6c8ee220425c
+Through personalized business idea matching, practical guidance, and digital innovation, SCI IDEA aims to make entrepreneurship more accessible, especially to young people in Kenya and across Africa.
 
-## Run Locally
+---
 
-**Prerequisites:**  [Android Studio](https://developer.android.com/studio)
+## About the Project
 
+Many aspiring entrepreneurs have the desire to start businesses but struggle to identify suitable opportunities, understand startup requirements, or determine how to use the resources available to them.
 
-1. Open Android Studio
-2. Select **Open** and choose the directory containing this project
-3. Allow Android Studio to fix any incompatibilities as it imports the project.
-4. Create a file named `.env` in the project directory and set `GEMINI_API_KEY` in that file to your Gemini API key (see `.env.example` for an example)
-5. Remove this line from the app's `build.gradle.kts` file: `signingConfig = signingConfigs.getByName("debugConfig")`
-6. Run the app on an emulator or physical device
-7. If you have already published your app in AI Studio, please [request upload key reset](https://support.google.com/googleplay/android-developer/answer/9842756#zippy=%2Crequest-an-upload-key-reset) in Google Play Console.
+SCI IDEA addresses this challenge by providing a platform where users can explore business ideas based on their individual circumstances.
+
+The platform focuses on practical entrepreneurship, innovation, financial awareness, and accessible business education.
+
+## Key Features
+
+- **Business Idea Matcher:** Discover business opportunities based on available capital, skills, interests, and other personal factors.
+- **Explore Business Ideas:** Browse business opportunities across different industries and categories.
+- **Search:** Find relevant business ideas using keywords.
+- **Idea Details:** Explore business requirements, estimated startup costs, target customers, and business guidance.
+- **Saved Ideas:** Keep track of interesting business opportunities.
+- **Market Trends:** Explore business and market-related information.
+- **Success Stories:** Access entrepreneurship inspiration and learning resources.
+- **User Accounts:** Account-based access to the application.
+- **AI Integration:** Planned AI-powered research and business idea generation with administrative review.
+
+## Who Can Benefit?
+
+SCI IDEA is designed for:
+
+- Students and university graduates.
+- Young people interested in entrepreneurship.
+- First-time business owners.
+- Individuals with limited startup capital.
+- Existing entrepreneurs exploring new opportunities.
+- Anyone interested in discovering practical business ideas.
+
+## Sustainable Development Goals (SDG) Alignment
+
+SCI IDEA contributes to the following United Nations Sustainable Development Goals:
+
+| SDG | Goal | Contribution |
+|---|---|---|
+| **SDG 8** | Decent Work and Economic Growth | Encourages entrepreneurship, self-employment, business creation, and sustainable economic opportunities. |
+| **SDG 4** | Quality Education | Promotes entrepreneurial learning, practical business knowledge, and skills development. |
+| **SDG 9** | Industry, Innovation and Infrastructure | Uses digital technology and AI to encourage innovation
